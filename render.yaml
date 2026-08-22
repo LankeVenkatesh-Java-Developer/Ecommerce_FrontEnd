@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: ecommerce-frontend
+    env: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm run preview
+    nodeVersion: 18
+    region: oregon
+    envVars:
+      - key: VITE_USER_SERVICE_URL
+        value: https://userservice-dp9v.onrender.com
+      - key: VITE_ADMIN_SERVICE_URL
+        value: https://adminservice.onrender.com
