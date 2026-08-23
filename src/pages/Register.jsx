@@ -6,7 +6,6 @@ import { authService } from '../services/authService';
 import Loading from '../components/Loading';
 import ErrorMessage from '../components/ErrorMessage';
 import { toast } from 'react-toastify';
-import './Auth.css';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -81,17 +80,21 @@ const Register = () => {
   };
 
   return (
-    <div className="auth-container">
-      <div className="auth-card">
-        <h1>Create Account</h1>
-        <p className="auth-subtitle">Join us today</p>
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full card-3d-xl p-8">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">Create Account</h1>
+          <p className="text-gray-600 dark:text-gray-400">Join us today</p>
+        </div>
 
         {error && <ErrorMessage message={error} onDismiss={() => setError('')} />}
 
-        <form onSubmit={handleSubmit} className="auth-form">
-          <div className="form-row">
-            <div className="form-group">
-              <label htmlFor="firstName">First Name</label>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="firstName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                First Name
+              </label>
               <input
                 type="text"
                 id="firstName"
@@ -101,11 +104,14 @@ const Register = () => {
                 required
                 placeholder="John"
                 disabled={loading}
+                className="input-3d"
               />
             </div>
 
-            <div className="form-group">
-              <label htmlFor="lastName">Last Name</label>
+            <div>
+              <label htmlFor="lastName" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                Last Name
+              </label>
               <input
                 type="text"
                 id="lastName"
@@ -114,12 +120,15 @@ const Register = () => {
                 onChange={handleChange}
                 placeholder="Doe"
                 disabled={loading}
+                className="input-3d"
               />
             </div>
           </div>
 
-          <div className="form-group">
-            <label htmlFor="email">Email</label>
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Email
+            </label>
             <input
               type="email"
               id="email"
@@ -129,11 +138,14 @@ const Register = () => {
               required
               placeholder="john@example.com"
               disabled={loading}
+              className="input-3d"
             />
           </div>
 
-          <div className="form-group">
-            <label htmlFor="mobileNumber">Mobile Number</label>
+          <div>
+            <label htmlFor="mobileNumber" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Mobile Number
+            </label>
             <input
               type="tel"
               id="mobileNumber"
@@ -143,11 +155,14 @@ const Register = () => {
               required
               placeholder="9876543210"
               disabled={loading}
+              className="input-3d"
             />
           </div>
 
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Password
+            </label>
             <input
               type="password"
               id="password"
@@ -157,11 +172,14 @@ const Register = () => {
               required
               placeholder="Min 8 characters"
               disabled={loading}
+              className="input-3d"
             />
           </div>
 
-          <div className="form-group">
-            <label htmlFor="confirmPassword">Confirm Password</label>
+          <div>
+            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Confirm Password
+            </label>
             <input
               type="password"
               id="confirmPassword"
@@ -171,16 +189,20 @@ const Register = () => {
               required
               placeholder="Confirm your password"
               disabled={loading}
+              className="input-3d"
             />
           </div>
 
-          <button type="submit" className="auth-button" disabled={loading}>
+          <button type="submit" className="btn-primary-3d w-full" disabled={loading}>
             {loading ? <Loading size="small" /> : 'Create Account'}
           </button>
         </form>
 
-        <p className="auth-footer">
-          Already have an account? <Link to="/login">Sign in</Link>
+        <p className="mt-6 text-center text-gray-600 dark:text-gray-400">
+          Already have an account?{' '}
+          <Link to="/login" className="text-primary-600 dark:text-primary-400 hover:text-primary-700 dark:hover:text-primary-300 font-medium transition-colors">
+            Sign in
+          </Link>
         </p>
       </div>
     </div>

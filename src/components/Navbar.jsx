@@ -7,7 +7,6 @@ import { authService } from '../services/authService';
 import { cartService } from '../services/cartService';
 import { useTheme } from '../contexts/ThemeContext';
 import Notifications from './Notifications';
-import './Navbar.css';
 
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -61,76 +60,161 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="navbar">
-      <div className="navbar-container">
-        <div className="navbar-brand">
-          <Link to="/" onClick={closeMobileMenu}>
-            <h1>ShopHub</h1>
-          </Link>
+    <nav className="sticky top-0 z-50 glass-effect border-b border-gray-200 dark:border-gray-700">
+      <div className="container-custom">
+        <div className="flex items-center justify-between h-16">
+          {/* Brand */}
+          <div className="flex-shrink-0">
+            <Link to="/" onClick={closeMobileMenu} className="flex items-center">
+              <h1 className="text-2xl font-bold gradient-text">ShopHub</h1>
+            </Link>
+          </div>
+
+          {/* Search - Desktop */}
+          <div className="hidden md:flex flex-1 max-w-lg mx-8">
+            <form onSubmit={handleSearch} className="relative w-full">
+              <input
+                type="text"
+                placeholder="Search products..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="input-3d pl-10 pr-4"
+              />
+              <button type="submit" className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-primary-500 transition-colors">
+                <FaSearch />
+              </button>
+            </form>
+          </div>
+
+          {/* Right Actions */}
+          <div className="flex items-center space-x-4">
+            {/* Theme Toggle */}
+            <button 
+              onClick={toggleTheme} 
+              title="Toggle theme"
+              className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-300 hover:scale-110"
+            >
+              {isDarkMode ? <FaSun className="text-yellow-400" /> : <FaMoon className="text-primary-500" />}
+            </button>
+
+            {/* Notifications */}
+            {isAuthenticated && <Notifications />}
+
+            {/* Mobile Menu Toggle */}
+            <button 
+              onClick={toggleMobileMenu}
+              className="md:hidden p-2 rounded-lg bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-300"
+            >
+              {isMobileMenuOpen ? <FaTimes /> : <FaBars />}
+            </button>
+
+            {/* Desktop Menu */}
+            <div className="hidden md:flex items-center space-x-4">
+              <Link to="/" className="nav-link text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 font-medium transition-colors" onClick={closeMobileMenu}>
+                Home
+              </Link>
+              <Link to="/products" className="nav-link text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 font-medium transition-colors" onClick={closeMobileMenu}>
+                Products
+              </Link>
+
+              {isAuthenticated ? (
+                <>
+                  <Link to="/cart" className="relative nav-link text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 font-medium transition-colors flex items-center" onClick={closeMobileMenu}>
+                    <FaShoppingCart />
+                    <span className="ml-2">Cart</span>
+                    {cartItemCount > 0 && (
+                      <span className="absolute -top-2 -right-2 bg-gradient-to-r from-primary-500 to-primary-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center shadow-lg">
+                        {cartItemCount}
+                      </span>
+                    )}
+                  </Link>
+                  <Link to="/orders" className="nav-link text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 font-medium transition-colors" onClick={closeMobileMenu}>
+                    Orders
+                  </Link>
+                  <Link to="/profile" className="nav-link text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 font-medium transition-colors flex items-center" onClick={closeMobileMenu}>
+                    <FaUser />
+                    <span className="ml-2">Profile</span>
+                  </Link>
+                  <button 
+                    onClick={handleLogout} 
+                    className="btn-danger-3d text-sm px-4 py-2 flex items-center"
+                  >
+                    <FaSignOutAlt />
+                    <span className="ml-2">Logout</span>
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link to="/login" className="nav-link text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 font-medium transition-colors" onClick={closeMobileMenu}>
+                    Login
+                  </Link>
+                  <Link to="/register" className="btn-primary-3d text-sm px-4 py-2" onClick={closeMobileMenu}>
+                    Register
+                  </Link>
+                </>
+              )}
+            </div>
+          </div>
         </div>
 
-        <div className="navbar-search">
-          <form onSubmit={handleSearch}>
+        {/* Mobile Menu */}
+        <div className={`md:hidden ${isMobileMenuOpen ? 'block' : 'hidden'} pb-4`}>
+          {/* Mobile Search */}
+          <form onSubmit={handleSearch} className="mb-4">
             <input
               type="text"
               placeholder="Search products..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="search-input"
+              className="input-3d"
             />
-            <button type="submit" className="search-button">
-              <FaSearch />
-            </button>
           </form>
-        </div>
 
-        <button className="theme-toggle" onClick={toggleTheme} title="Toggle theme">
-          {isDarkMode ? <FaSun /> : <FaMoon />}
-        </button>
+          <div className="flex flex-col space-y-3">
+            <Link to="/" className="nav-link text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 font-medium transition-colors py-2" onClick={closeMobileMenu}>
+              Home
+            </Link>
+            <Link to="/products" className="nav-link text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 font-medium transition-colors py-2" onClick={closeMobileMenu}>
+              Products
+            </Link>
 
-        {isAuthenticated && <Notifications />}
-
-        <button className="mobile-menu-toggle" onClick={toggleMobileMenu}>
-          {isMobileMenuOpen ? <FaTimes /> : <FaBars />}
-        </button>
-
-        <div className={`navbar-menu ${isMobileMenuOpen ? 'active' : ''}`}>
-          <Link to="/" className="nav-link" onClick={closeMobileMenu}>
-            Home
-          </Link>
-          <Link to="/products" className="nav-link" onClick={closeMobileMenu}>
-            Products
-          </Link>
-
-          {isAuthenticated ? (
-            <>
-              <Link to="/cart" className="nav-link" onClick={closeMobileMenu}>
-                <FaShoppingCart />
-                <span>Cart</span>
-                {cartItemCount > 0 && <span className="cart-badge">{cartItemCount}</span>}
-              </Link>
-              <Link to="/orders" className="nav-link" onClick={closeMobileMenu}>
-                Orders
-              </Link>
-              <Link to="/profile" className="nav-link" onClick={closeMobileMenu}>
-                <FaUser />
-                <span>Profile</span>
-              </Link>
-              <button onClick={handleLogout} className="nav-link logout-button">
-                <FaSignOutAlt />
-                <span>Logout</span>
-              </button>
-            </>
-          ) : (
-            <>
-              <Link to="/login" className="nav-link" onClick={closeMobileMenu}>
-                Login
-              </Link>
-              <Link to="/register" className="nav-link register-button" onClick={closeMobileMenu}>
-                Register
-              </Link>
-            </>
-          )}
+            {isAuthenticated ? (
+              <>
+                <Link to="/cart" className="relative nav-link text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 font-medium transition-colors py-2 flex items-center" onClick={closeMobileMenu}>
+                  <FaShoppingCart />
+                  <span className="ml-2">Cart</span>
+                  {cartItemCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-gradient-to-r from-primary-500 to-primary-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center shadow-lg">
+                      {cartItemCount}
+                    </span>
+                  )}
+                </Link>
+                <Link to="/orders" className="nav-link text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 font-medium transition-colors py-2" onClick={closeMobileMenu}>
+                  Orders
+                </Link>
+                <Link to="/profile" className="nav-link text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 font-medium transition-colors py-2 flex items-center" onClick={closeMobileMenu}>
+                  <FaUser />
+                  <span className="ml-2">Profile</span>
+                </Link>
+                <button 
+                  onClick={handleLogout} 
+                  className="btn-danger-3d text-sm py-3 flex items-center justify-center"
+                >
+                  <FaSignOutAlt />
+                  <span className="ml-2">Logout</span>
+                </button>
+              </>
+            ) : (
+              <>
+                <Link to="/login" className="nav-link text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 font-medium transition-colors py-2" onClick={closeMobileMenu}>
+                  Login
+                </Link>
+                <Link to="/register" className="btn-primary-3d text-sm py-3" onClick={closeMobileMenu}>
+                  Register
+                </Link>
+              </>
+            )}
+          </div>
         </div>
       </div>
     </nav>
