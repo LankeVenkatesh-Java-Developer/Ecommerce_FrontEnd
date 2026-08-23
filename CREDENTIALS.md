@@ -41,9 +41,10 @@ This document provides sample credentials for testing all functionalities of the
 
 ### 1. User Registration
 - Navigate to `/register`
-- Use any of the alternative user credentials above
+- Fill in all required fields including confirmPassword
 - Ensure mobile number follows Indian format (starts with 6-9, 10 digits)
-- Password must be at least 8 characters
+- Password must be 8-100 characters
+- confirmPassword must match password exactly
 
 ### 2. User Login
 - Navigate to `/login`

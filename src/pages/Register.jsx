@@ -63,8 +63,7 @@ const Register = () => {
     try {
       dispatch(registerStart());
 
-      const { confirmPassword, ...registerData } = formData;
-      await authService.register(registerData);
+      await authService.register(formData);
 
       dispatch(registerSuccess());
       toast.success('Registration successful! Please login.');
