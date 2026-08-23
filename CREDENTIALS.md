@@ -2,14 +2,18 @@
 
 This document provides sample credentials for testing all functionalities of the ShopHub Ecommerce Frontend application.
 
+**IMPORTANT:** These are sample credentials for testing purposes. If you have an existing user management system, you should use your actual existing user credentials from your backend database. The sample credentials below may not exist in your backend.
+
 ## User Credentials
 
-### Test User Account
+### Test User Account (Sample - may not exist in your backend)
 - **Email:** `testuser@example.com`
 - **Password:** `Test@1234`
 - **First Name:** `John`
 - **Last Name:** `Doe`
 - **Mobile Number:** `9876543210`
+
+**Note:** If login fails with 400 error, this user likely doesn't exist in your backend. Use your actual existing user credentials instead.
 
 ### Alternative User Accounts
 - **Email:** `jane@example.com`
