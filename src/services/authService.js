@@ -1,15 +1,20 @@
 import axiosConfig from '../api/axiosConfig';
 import { AUTH_ENDPOINTS } from '../api/endpoints';
-import { setToken, setUser, clearAuthData } from '../utils/tokenUtils';
+import { setToken, setUser, setRole, clearAuthData } from '../utils/tokenUtils';
 
 export const authService = {
   login: async (loginData) => {
     const response = await axiosConfig.post(AUTH_ENDPOINTS.LOGIN, loginData);
-    const { userId, email, accessToken, tokenType, expiresIn } = response.data;
+    const { userId, email, token, type, role } = response.data;
 
     // Store token and user data
-    setToken(accessToken);
-    setUser({ id: userId, email });
+    setToken(token);
+    setUser({ id: userId, email, role });
+    
+    // Store role if provided
+    if (role) {
+      setRole(role);
+    }
 
     return response.data;
   },

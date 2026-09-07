@@ -1,5 +1,6 @@
 const TOKEN_KEY = 'accessToken';
 const USER_KEY = 'user';
+const ROLE_KEY = 'userRole';
 
 export const getToken = () => {
   return localStorage.getItem(TOKEN_KEY);
@@ -26,11 +27,29 @@ export const removeUser = () => {
   localStorage.removeItem(USER_KEY);
 };
 
+export const getRole = () => {
+  return localStorage.getItem(ROLE_KEY);
+};
+
+export const setRole = (role) => {
+  localStorage.setItem(ROLE_KEY, role);
+};
+
+export const removeRole = () => {
+  localStorage.removeItem(ROLE_KEY);
+};
+
 export const isAuthenticated = () => {
   return !!getToken();
+};
+
+export const isAdmin = () => {
+  const role = getRole();
+  return role === 'ADMIN' || role === 'SUPER_ADMIN';
 };
 
 export const clearAuthData = () => {
   removeToken();
   removeUser();
+  removeRole();
 };

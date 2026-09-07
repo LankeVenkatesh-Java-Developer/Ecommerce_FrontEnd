@@ -15,11 +15,11 @@ const Home = () => {
     const fetchData = async () => {
       try {
         const [productsData, categoriesData] = await Promise.all([
-          productService.getAllProducts({ pageSize: 8 }),
+          productService.getAllProducts({ page: 0, size: 8 }),
           productService.getAllCategories(),
         ]);
-        setFeaturedProducts(productsData.products);
-        setCategories(categoriesData);
+        setFeaturedProducts(productsData.content || productsData || []);
+        setCategories(Array.isArray(categoriesData) ? categoriesData : categoriesData.content || []);
       } catch (error) {
         console.error('Failed to fetch data:', error);
         toast.error('Failed to load products');
@@ -48,9 +48,17 @@ const Home = () => {
 
   return (
     <div className="min-h-screen">
+      {/* Promo Banner */}
+      <div className="bg-gradient-to-r from-accent-500 to-secondary-500 text-white py-3">
+        <div className="container-custom text-center">
+          <p className="text-sm font-medium">🎉 Free Shipping on Orders Over $50! Use Code: <span className="font-bold">FREESHIP</span></p>
+        </div>
+      </div>
+
       {/* Hero Section */}
       <section className="relative overflow-hidden bg-gradient-to-br from-primary-600 via-primary-500 to-secondary-500 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-20 lg:py-32">
         <div className="absolute inset-0 bg-black/10 dark:bg-black/30"></div>
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIj48cGF0aCBkPSJNMzYgMzRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yIDItNCAyLTRzLTItMi0yLTRjMC0yDQo8L2c+PC9nPjwvc3ZnPg==')] opacity-20"></div>
         <div className="container-custom relative z-10">
           <div className="max-w-3xl mx-auto text-center">
             <h1 className="text-4xl md:text-6xl font-bold text-white mb-6 animate-slide-up">
@@ -59,14 +67,21 @@ const Home = () => {
             <p className="text-xl md:text-2xl text-white/90 mb-8 animate-slide-up" style={{ animationDelay: '0.1s' }}>
               Discover amazing products at unbeatable prices
             </p>
-            <Link 
-              to="/products" 
-              className="inline-flex items-center btn-3d bg-white text-primary-600 hover:bg-gray-100 px-8 py-4 text-lg font-semibold rounded-xl shadow-2xl animate-slide-up"
-              style={{ animationDelay: '0.2s' }}
-            >
-              <span>Shop Now</span>
-              <FaArrowRight className="ml-2" />
-            </Link>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center animate-slide-up" style={{ animationDelay: '0.2s' }}>
+              <Link 
+                to="/products" 
+                className="inline-flex items-center btn-3d bg-white text-primary-600 hover:bg-gray-100 px-8 py-4 text-lg font-semibold rounded-xl shadow-2xl"
+              >
+                <span>Shop Now</span>
+                <FaArrowRight className="ml-2" />
+              </Link>
+              <Link 
+                to="/products?category=1" 
+                className="inline-flex items-center btn-3d bg-white/20 text-white hover:bg-white/30 backdrop-blur-sm px-8 py-4 text-lg font-semibold rounded-xl border-2 border-white/30"
+              >
+                <span>New Arrivals</span>
+              </Link>
+            </div>
           </div>
         </div>
         {/* Decorative elements */}
@@ -135,11 +150,21 @@ const Home = () => {
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />
                   </div>
-                  {product.stockQuantity === 0 && (
-                    <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                      <span className="text-white font-semibold px-4 py-2 bg-red-500 rounded-lg">Out of Stock</span>
-                    </div>
-                  )}
+                  {/* Badges */}
+                  <div className="absolute top-2 left-2 flex flex-col gap-1">
+                    {product.quantity === 0 && (
+                      <span className="bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded-lg">Out of Stock</span>
+                    )}
+                    {product.quantity > 0 && product.quantity < 10 && (
+                      <span className="bg-orange-500 text-white text-xs font-semibold px-2 py-1 rounded-lg">Low Stock</span>
+                    )}
+                    {product.id % 3 === 0 && product.quantity > 0 && (
+                      <span className="bg-accent-500 text-white text-xs font-semibold px-2 py-1 rounded-lg">New</span>
+                    )}
+                    {product.id % 5 === 0 && product.quantity > 0 && (
+                      <span className="bg-secondary-500 text-white text-xs font-semibold px-2 py-1 rounded-lg">-20%</span>
+                    )}
+                  </div>
                 </Link>
                 <div className="p-4">
                   <Link to={`/products/${product.id}`} className="block">
@@ -154,12 +179,19 @@ const Home = () => {
                     <span className="text-sm text-gray-500 dark:text-gray-400 ml-1">({product.reviews})</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-xl font-bold text-primary-600 dark:text-primary-400">
-                      ${product.price.toFixed(2)}
-                    </span>
+                    <div className="flex flex-col">
+                      <span className="text-xl font-bold text-primary-600 dark:text-primary-400">
+                        ${product.price ? Number(product.price).toFixed(2) : '0.00'}
+                      </span>
+                      {product.id % 5 === 0 && (
+                        <span className="text-xs text-gray-400 line-through">
+                          ${(product.price * 1.25).toFixed(2)}
+                        </span>
+                      )}
+                    </div>
                     <button
                       onClick={() => handleAddToCart(product)}
-                      disabled={product.stockQuantity === 0}
+                      disabled={product.quantity === 0}
                       className="btn-primary-3d p-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <FaShoppingCart />

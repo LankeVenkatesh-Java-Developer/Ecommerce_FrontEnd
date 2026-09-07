@@ -39,7 +39,7 @@ const ProductDetails = () => {
 
   const handleQuantityChange = (e) => {
     const value = parseInt(e.target.value);
-    if (value >= 1 && value <= (product?.stockQuantity || 0)) {
+    if (value >= 1 && value <= (product?.quantity || 0)) {
       setQuantity(value);
     }
   };
@@ -117,9 +117,9 @@ const ProductDetails = () => {
           </div>
 
           <div className="product-price">
-            <span className="current-price">${product.price.toFixed(2)}</span>
-            {product.stockQuantity < 10 && product.stockQuantity > 0 && (
-              <span className="stock-warning">Only {product.stockQuantity} left in stock!</span>
+            <span className="current-price">${product.price ? Number(product.price).toFixed(2) : '0.00'}</span>
+            {product.quantity < 10 && product.quantity > 0 && (
+              <span className="stock-warning">Only {product.quantity} left in stock!</span>
             )}
           </div>
 
@@ -135,17 +135,17 @@ const ProductDetails = () => {
             </div>
             <div className="meta-item">
               <span className="meta-label">Availability:</span>
-              <span className={`meta-value ${product.stockQuantity > 0 ? 'in-stock' : 'out-of-stock'}`}>
-                {product.stockQuantity > 0 ? 'In Stock' : 'Out of Stock'}
+              <span className={`meta-value ${product.quantity > 0 ? 'in-stock' : 'out-of-stock'}`}>
+                {product.quantity > 0 ? 'In Stock' : 'Out of Stock'}
               </span>
             </div>
             <div className="meta-item">
               <span className="meta-label">Category:</span>
-              <span className="meta-value">Electronics</span>
+              <span className="meta-value">{product.category?.name || 'N/A'}</span>
             </div>
           </div>
 
-          {product.stockQuantity > 0 ? (
+          {product.quantity > 0 ? (
             <div className="product-actions">
               <div className="quantity-selector">
                 <button
@@ -160,12 +160,12 @@ const ProductDetails = () => {
                   value={quantity}
                   onChange={handleQuantityChange}
                   min="1"
-                  max={product.stockQuantity}
+                  max={product.quantity}
                 />
                 <button
                   className="quantity-btn"
-                  onClick={() => setQuantity(Math.min(product.stockQuantity, quantity + 1))}
-                  disabled={quantity >= product.stockQuantity}
+                  onClick={() => setQuantity(Math.min(product.quantity, quantity + 1))}
+                  disabled={quantity >= product.quantity}
                 >
                   +
                 </button>
@@ -174,7 +174,7 @@ const ProductDetails = () => {
               <button
                 className="add-to-cart-btn"
                 onClick={handleAddToCart}
-                disabled={quantity > product.stockQuantity}
+                disabled={quantity > product.quantity}
               >
                 <FaShoppingCart />
                 <span>Add to Cart</span>

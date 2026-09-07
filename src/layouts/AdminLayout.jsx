@@ -75,7 +75,7 @@ const AdminLayout = () => {
         <div className="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200 dark:border-gray-700">
           <div className="mb-4">
             <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Logged in as:</p>
-            <p className="font-medium text-gray-900 dark:text-white">{user?.firstName} {user?.lastName}</p>
+            <p className="font-medium text-gray-900 dark:text-white">{user?.firstName || 'Admin'} {user?.lastName || 'User'}</p>
           </div>
           <button 
             className="btn-danger-3d w-full flex items-center justify-center" 

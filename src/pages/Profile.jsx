@@ -7,7 +7,6 @@ import ErrorMessage from '../components/ErrorMessage';
 import { toast } from 'react-toastify';
 import { FaPlus, FaEdit, FaTrash, FaMapMarkerAlt } from 'react-icons/fa';
 import { ADDRESS_TYPES } from '../utils/constants';
-import './Profile.css';
 
 const Profile = () => {
   const { user } = useSelector((state) => state.auth);
@@ -178,280 +177,303 @@ const Profile = () => {
   }
 
   return (
-    <div className="profile-container">
-      <div className="profile-header">
-        <h1>My Profile</h1>
-        <p>Manage your account information and addresses</p>
-      </div>
-
-      {error && <ErrorMessage message={error} onDismiss={() => setError('')} />}
-
-      <div className="profile-card">
-        <div className="profile-avatar">
-          <div className="avatar-circle">
-            {user.firstName ? user.firstName.charAt(0).toUpperCase() : 'U'}
-          </div>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 py-8 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-6xl mx-auto">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">My Profile</h1>
+          <p className="text-gray-600 dark:text-gray-400">Manage your account information and addresses</p>
         </div>
 
-        <div className="profile-form">
-          <div className="form-group">
-            <label>First Name</label>
-            {isEditing ? (
-              <input
-                type="text"
-                name="firstName"
-                value={formData.firstName}
-                onChange={handleChange}
-                disabled={loading}
-              />
-            ) : (
-              <span>{user.firstName || '-'}</span>
-            )}
-          </div>
+        {error && <ErrorMessage message={error} onDismiss={() => setError('')} />}
 
-          <div className="form-group">
-            <label>Last Name</label>
-            {isEditing ? (
-              <input
-                type="text"
-                name="lastName"
-                value={formData.lastName}
-                onChange={handleChange}
-                disabled={loading}
-              />
-            ) : (
-              <span>{user.lastName || '-'}</span>
-            )}
-          </div>
-
-          <div className="form-group">
-            <label>Email</label>
-            <span className="readonly-field">{user.email || '-'}</span>
-          </div>
-
-          <div className="form-group">
-            <label>Mobile Number</label>
-            {isEditing ? (
-              <input
-                type="tel"
-                name="mobileNumber"
-                value={formData.mobileNumber}
-                onChange={handleChange}
-                disabled={loading}
-              />
-            ) : (
-              <span>{user.mobileNumber || '-'}</span>
-            )}
-          </div>
-
-          <div className="form-group">
-            <label>Status</label>
-            <span className={`status-badge ${user.status?.toLowerCase()}`}>
-              {user.status || 'ACTIVE'}
-            </span>
-          </div>
-
-          <div className="profile-actions">
-            {isEditing ? (
-              <>
-                <button
-                  className="btn btn-secondary"
-                  onClick={handleCancel}
-                  disabled={loading}
-                >
-                  Cancel
-                </button>
-                <button
-                  className="btn btn-primary"
-                  onClick={handleSave}
-                  disabled={loading}
-                >
-                  {loading ? <Loading size="small" /> : 'Save Changes'}
-                </button>
-              </>
-            ) : (
-              <button
-                className="btn btn-primary"
-                onClick={() => setIsEditing(true)}
-              >
-                Edit Profile
-              </button>
-            )}
-          </div>
-        </div>
-      </div>
-
-      <div className="addresses-section">
-        <div className="section-header">
-          <h2>My Addresses</h2>
-          <button className="btn btn-primary" onClick={handleAddAddress}>
-            <FaPlus />
-            <span>Add Address</span>
-          </button>
-        </div>
-
-        {loadingAddresses ? (
-          <Loading />
-        ) : addresses.length === 0 ? (
-          <div className="empty-state">
-            <FaMapMarkerAlt />
-            <p>No addresses added yet</p>
-          </div>
-        ) : (
-          <div className="addresses-grid">
-            {addresses.map((address) => (
-              <div key={address.id} className="address-card">
-                {address.isDefault && <span className="default-badge">Default</span>}
-                <div className="address-type">{address.addressType}</div>
-                <div className="address-details">
-                  <p>{address.addressLine1}</p>
-                  {address.addressLine2 && <p>{address.addressLine2}</p>}
-                  <p>{address.city}, {address.state}</p>
-                  <p>{address.country} - {address.postalCode}</p>
-                </div>
-                <div className="address-actions">
-                  <button
-                    className="btn-icon"
-                    onClick={() => handleEditAddress(address)}
-                    title="Edit"
-                  >
-                    <FaEdit />
-                  </button>
-                  <button
-                    className="btn-icon btn-icon-danger"
-                    onClick={() => handleDeleteAddress(address.id)}
-                    title="Delete"
-                  >
-                    <FaTrash />
-                  </button>
-                </div>
+        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border border-gray-200 dark:border-gray-700 p-8 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-[280px_1fr] gap-8">
+            <div className="flex flex-col items-center justify-start gap-6">
+              <div className="w-36 h-36 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 text-white text-4xl font-bold flex items-center justify-center shadow-lg border-4 border-white dark:border-gray-800">
+                {user.firstName ? user.firstName.charAt(0).toUpperCase() : 'U'}
               </div>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {showAddressModal && (
-        <div className="modal-overlay" onClick={() => setShowAddressModal(false)}>
-          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-header">
-              <h3>{editingAddress ? 'Edit Address' : 'Add New Address'}</h3>
-              <button className="modal-close" onClick={() => setShowAddressModal(false)}>
-                ×
-              </button>
             </div>
-            <form onSubmit={handleSaveAddress} className="address-form">
-              <div className="form-group">
-                <label>Address Line 1 *</label>
-                <input
-                  type="text"
-                  name="addressLine1"
-                  value={addressForm.addressLine1}
-                  onChange={handleAddressChange}
-                  required
-                  disabled={loading}
-                />
-              </div>
-              <div className="form-group">
-                <label>Address Line 2</label>
-                <input
-                  type="text"
-                  name="addressLine2"
-                  value={addressForm.addressLine2}
-                  onChange={handleAddressChange}
-                  disabled={loading}
-                />
-              </div>
-              <div className="form-row">
-                <div className="form-group">
-                  <label>City *</label>
+
+            <div className="flex flex-col gap-6">
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">First Name</label>
+                {isEditing ? (
                   <input
                     type="text"
-                    name="city"
-                    value={addressForm.city}
+                    name="firstName"
+                    value={formData.firstName}
+                    onChange={handleChange}
+                    disabled={loading}
+                    className="input-3d"
+                  />
+                ) : (
+                  <span className="text-gray-900 dark:text-white text-lg">{user.firstName || '-'}</span>
+                )}
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Last Name</label>
+                {isEditing ? (
+                  <input
+                    type="text"
+                    name="lastName"
+                    value={formData.lastName}
+                    onChange={handleChange}
+                    disabled={loading}
+                    className="input-3d"
+                  />
+                ) : (
+                  <span className="text-gray-900 dark:text-white text-lg">{user.lastName || '-'}</span>
+                )}
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Email</label>
+                <span className="text-gray-500 dark:text-gray-400 text-lg italic">{user.email || '-'}</span>
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Mobile Number</label>
+                {isEditing ? (
+                  <input
+                    type="tel"
+                    name="mobileNumber"
+                    value={formData.mobileNumber}
+                    onChange={handleChange}
+                    disabled={loading}
+                    className="input-3d"
+                  />
+                ) : (
+                  <span className="text-gray-900 dark:text-white text-lg">{user.mobileNumber || '-'}</span>
+                )}
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label className="text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Status</label>
+                <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium uppercase ${
+                  user.status?.toLowerCase() === 'active' 
+                    ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' 
+                    : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+                }`}>
+                  {user.status || 'ACTIVE'}
+                </span>
+              </div>
+
+              <div className="flex gap-4 mt-4">
+                {isEditing ? (
+                  <>
+                    <button
+                      className="btn-secondary-3d"
+                      onClick={handleCancel}
+                      disabled={loading}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      className="btn-primary-3d"
+                      onClick={handleSave}
+                      disabled={loading}
+                    >
+                      {loading ? <Loading size="small" /> : 'Save Changes'}
+                    </button>
+                  </>
+                ) : (
+                  <button
+                    className="btn-primary-3d"
+                    onClick={() => setIsEditing(true)}
+                  >
+                    Edit Profile
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-12">
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">My Addresses</h2>
+            <button className="btn-primary-3d flex items-center gap-2" onClick={handleAddAddress}>
+              <FaPlus />
+              <span>Add Address</span>
+            </button>
+          </div>
+
+          {loadingAddresses ? (
+            <Loading />
+          ) : addresses.length === 0 ? (
+            <div className="text-center py-12 text-gray-500 dark:text-gray-400">
+              <FaMapMarkerAlt className="text-4xl mx-auto mb-4" />
+              <p>No addresses added yet</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {addresses.map((address) => (
+                <div key={address.id} className="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 p-6 relative hover:shadow-lg transition-shadow">
+                  {address.isDefault && (
+                    <span className="absolute top-4 right-4 bg-green-500 text-white px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider">
+                      Default
+                    </span>
+                  )}
+                  <div className="text-sm font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider mb-3">
+                    {address.addressType}
+                  </div>
+                  <div className="space-y-1 text-gray-600 dark:text-gray-300">
+                    <p>{address.addressLine1}</p>
+                    {address.addressLine2 && <p>{address.addressLine2}</p>}
+                    <p>{address.city}, {address.state}</p>
+                    <p>{address.country} - {address.postalCode}</p>
+                  </div>
+                  <div className="flex gap-2 mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <button
+                      className="p-2 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                      onClick={() => handleEditAddress(address)}
+                      title="Edit"
+                    >
+                      <FaEdit />
+                    </button>
+                    <button
+                      className="p-2 bg-gray-100 dark:bg-gray-700 text-red-500 rounded hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                      onClick={() => handleDeleteAddress(address.id)}
+                      title="Delete"
+                    >
+                      <FaTrash />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {showAddressModal && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4" onClick={() => setShowAddressModal(false)}>
+            <div className="bg-white dark:bg-gray-800 rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-gray-200 dark:border-gray-700" onClick={(e) => e.stopPropagation()}>
+              <div className="flex justify-between items-center p-6 border-b border-gray-200 dark:border-gray-700">
+                <h3 className="text-xl font-semibold text-gray-900 dark:text-white">{editingAddress ? 'Edit Address' : 'Add New Address'}</h3>
+                <button className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors" onClick={() => setShowAddressModal(false)}>
+                  ×
+                </button>
+              </div>
+              <form onSubmit={handleSaveAddress} className="p-6 flex flex-col gap-6">
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Address Line 1 *</label>
+                  <input
+                    type="text"
+                    name="addressLine1"
+                    value={addressForm.addressLine1}
                     onChange={handleAddressChange}
                     required
                     disabled={loading}
+                    className="input-3d"
                   />
                 </div>
-                <div className="form-group">
-                  <label>State *</label>
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Address Line 2</label>
                   <input
                     type="text"
-                    name="state"
-                    value={addressForm.state}
+                    name="addressLine2"
+                    value={addressForm.addressLine2}
                     onChange={handleAddressChange}
-                    required
                     disabled={loading}
+                    className="input-3d"
                   />
                 </div>
-              </div>
-              <div className="form-row">
-                <div className="form-group">
-                  <label>Country *</label>
-                  <input
-                    type="text"
-                    name="country"
-                    value={addressForm.country}
-                    onChange={handleAddressChange}
-                    required
-                    disabled={loading}
-                  />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-2">
+                    <label className="text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">City *</label>
+                    <input
+                      type="text"
+                      name="city"
+                      value={addressForm.city}
+                      onChange={handleAddressChange}
+                      required
+                      disabled={loading}
+                      className="input-3d"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <label className="text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">State *</label>
+                    <input
+                      type="text"
+                      name="state"
+                      value={addressForm.state}
+                      onChange={handleAddressChange}
+                      required
+                      disabled={loading}
+                      className="input-3d"
+                    />
+                  </div>
                 </div>
-                <div className="form-group">
-                  <label>Postal Code *</label>
-                  <input
-                    type="text"
-                    name="postalCode"
-                    value={addressForm.postalCode}
-                    onChange={handleAddressChange}
-                    required
-                    disabled={loading}
-                  />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="flex flex-col gap-2">
+                    <label className="text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Country *</label>
+                    <input
+                      type="text"
+                      name="country"
+                      value={addressForm.country}
+                      onChange={handleAddressChange}
+                      required
+                      disabled={loading}
+                      className="input-3d"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-2">
+                    <label className="text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Postal Code *</label>
+                    <input
+                      type="text"
+                      name="postalCode"
+                      value={addressForm.postalCode}
+                      onChange={handleAddressChange}
+                      required
+                      disabled={loading}
+                      className="input-3d"
+                    />
+                  </div>
                 </div>
-              </div>
-              <div className="form-group">
-                <label>Address Type</label>
-                <select
-                  name="addressType"
-                  value={addressForm.addressType}
-                  onChange={handleAddressChange}
-                  disabled={loading}
-                >
-                  <option value="HOME">Home</option>
-                  <option value="WORK">Work</option>
-                  <option value="OTHER">Other</option>
-                </select>
-              </div>
-              <div className="form-group checkbox-group">
-                <label>
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm font-semibold text-gray-600 dark:text-gray-400 uppercase tracking-wider">Address Type</label>
+                  <select
+                    name="addressType"
+                    value={addressForm.addressType}
+                    onChange={handleAddressChange}
+                    disabled={loading}
+                    className="input-3d"
+                  >
+                    <option value="HOME">Home</option>
+                    <option value="WORK">Work</option>
+                    <option value="OTHER">Other</option>
+                  </select>
+                </div>
+                <div className="flex items-center gap-3">
                   <input
                     type="checkbox"
                     name="isDefault"
                     checked={addressForm.isDefault}
                     onChange={handleAddressChange}
                     disabled={loading}
+                    className="w-5 h-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                   />
-                  <span>Set as default address</span>
-                </label>
-              </div>
-              <div className="modal-actions">
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={() => setShowAddressModal(false)}
-                  disabled={loading}
-                >
-                  Cancel
-                </button>
-                <button type="submit" className="btn btn-primary" disabled={loading}>
-                  {loading ? <Loading size="small" /> : editingAddress ? 'Update' : 'Add'}
-                </button>
-              </div>
-            </form>
+                  <label className="text-gray-700 dark:text-gray-300 cursor-pointer">Set as default address</label>
+                </div>
+                <div className="flex gap-4 justify-end mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                  <button
+                    type="button"
+                    className="btn-secondary-3d"
+                    onClick={() => setShowAddressModal(false)}
+                    disabled={loading}
+                  >
+                    Cancel
+                  </button>
+                  <button type="submit" className="btn-primary-3d" disabled={loading}>
+                    {loading ? <Loading size="small" /> : editingAddress ? 'Update' : 'Add'}
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 };

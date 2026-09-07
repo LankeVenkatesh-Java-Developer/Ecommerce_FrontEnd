@@ -112,6 +112,7 @@
   box-shadow: var(--shadow-sm);
   border: 1px solid var(--border-color);
   transition: all var(--transition-base);
+  min-height: 120px;
 }
 
 .cart-item:hover {

@@ -15,6 +15,7 @@ const Register = () => {
     mobileNumber: '',
     password: '',
     confirmPassword: '',
+    role: 'CUSTOMER',
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -191,6 +192,7 @@ const Register = () => {
               className="input-3d"
             />
           </div>
+
 
           <button type="submit" className="btn-primary-3d w-full" disabled={loading}>
             {loading ? <Loading size="small" /> : 'Create Account'}

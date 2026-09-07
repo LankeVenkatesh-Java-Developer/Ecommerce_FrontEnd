@@ -13,7 +13,7 @@ const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [cartItemCount, setCartItemCount] = useState(0);
 
-  const { isAuthenticated, user } = useSelector((state) => state.auth);
+  const { isAuthenticated, user, role } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
@@ -135,6 +135,20 @@ const Navbar = () => {
                     <FaUser />
                     <span className="ml-2">Profile</span>
                   </Link>
+                  {/* Admin Links - Only show to admins */}
+                  {(role === 'ADMIN' || role === 'SUPER_ADMIN') && (
+                    <>
+                      <Link to="/admin" className="nav-link text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 font-medium transition-colors" onClick={closeMobileMenu}>
+                        Admin
+                      </Link>
+                      <Link to="/admin/products" className="nav-link text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 font-medium transition-colors" onClick={closeMobileMenu}>
+                        Products
+                      </Link>
+                      <Link to="/admin/categories" className="nav-link text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 font-medium transition-colors" onClick={closeMobileMenu}>
+                        Categories
+                      </Link>
+                    </>
+                  )}
                   <button 
                     onClick={handleLogout} 
                     className="btn-danger-3d text-sm px-4 py-2 flex items-center"
@@ -196,6 +210,21 @@ const Navbar = () => {
                   <FaUser />
                   <span className="ml-2">Profile</span>
                 </Link>
+                {/* Admin Links - Only show to admins */}
+                {(role === 'ADMIN' || role === 'SUPER_ADMIN') && (
+                  <div className="border-t border-gray-200 dark:border-gray-700 pt-3 mt-3">
+                    <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">Admin</p>
+                    <Link to="/admin" className="nav-link text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 font-medium transition-colors py-2" onClick={closeMobileMenu}>
+                      Dashboard
+                    </Link>
+                    <Link to="/admin/products" className="nav-link text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 font-medium transition-colors py-2" onClick={closeMobileMenu}>
+                      Products
+                    </Link>
+                    <Link to="/admin/categories" className="nav-link text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 font-medium transition-colors py-2" onClick={closeMobileMenu}>
+                      Categories
+                    </Link>
+                  </div>
+                )}
                 <button 
                   onClick={handleLogout} 
                   className="btn-danger-3d text-sm py-3 flex items-center justify-center"

@@ -41,7 +41,7 @@ const Products = () => {
   const fetchCategories = async () => {
     try {
       const data = await productService.getAllCategories();
-      setCategories(data);
+      setCategories(Array.isArray(data) ? data : data.content || []);
     } catch (err) {
       console.error('Failed to fetch categories:', err);
     }
@@ -53,22 +53,21 @@ const Products = () => {
 
     try {
       const params = {
-        categoryId: filters.categoryId || undefined,
-        search: filters.search || undefined,
-        minPrice: filters.minPrice || undefined,
-        maxPrice: filters.maxPrice || undefined,
-        sortBy: filters.sortBy || undefined,
-        page: pagination.page,
-        pageSize: pagination.pageSize,
+        page: pagination.page - 1,
+        size: pagination.pageSize,
       };
+      if (filters.categoryId) params.categoryId = filters.categoryId;
+      if (filters.search) params.search = filters.search;
+      if (filters.sortBy) params.sort = filters.sortBy === 'price-asc' ? 'price,asc' : filters.sortBy === 'price-desc' ? 'price,desc' : 'name,asc';
 
       const data = await productService.getAllProducts(params);
-      setProducts(data.products);
+      const products = data.content || data || [];
+      setProducts(products);
       setPagination({
-        page: data.page,
-        pageSize: data.pageSize,
-        total: data.total,
-        totalPages: data.totalPages,
+        page: (data.pageable?.pageNumber || 0) + 1,
+        pageSize: data.pageable?.pageSize || pagination.pageSize,
+        total: data.totalElements || products.length,
+        totalPages: data.totalPages || 1,
       });
     } catch (err) {
       const errorMessage = err.response?.data?.message || err.message || 'Failed to fetch products';
@@ -249,11 +248,21 @@ const Products = () => {
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
                       </div>
-                      {product.stockQuantity === 0 && (
-                        <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                          <span className="text-white font-semibold px-4 py-2 bg-red-500 rounded-lg">Out of Stock</span>
-                        </div>
-                      )}
+                      {/* Badges */}
+                      <div className="absolute top-2 left-2 flex flex-col gap-1">
+                        {product.quantity === 0 && (
+                          <span className="bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded-lg">Out of Stock</span>
+                        )}
+                        {product.quantity > 0 && product.quantity < 10 && (
+                          <span className="bg-orange-500 text-white text-xs font-semibold px-2 py-1 rounded-lg">Low Stock</span>
+                        )}
+                        {product.id % 3 === 0 && product.quantity > 0 && (
+                          <span className="bg-accent-500 text-white text-xs font-semibold px-2 py-1 rounded-lg">New</span>
+                        )}
+                        {product.id % 5 === 0 && product.quantity > 0 && (
+                          <span className="bg-secondary-500 text-white text-xs font-semibold px-2 py-1 rounded-lg">-20%</span>
+                        )}
+                      </div>
                     </Link>
                     <div className="p-4">
                       <Link to={`/products/${product.id}`} className="block">
@@ -268,12 +277,19 @@ const Products = () => {
                         <span className="text-sm text-gray-500 dark:text-gray-400 ml-1">({product.reviews})</span>
                       </div>
                       <div className="flex items-center justify-between">
-                        <span className="text-xl font-bold text-primary-600 dark:text-primary-400">
-                          ${product.price.toFixed(2)}
-                        </span>
+                        <div className="flex flex-col">
+                          <span className="text-xl font-bold text-primary-600 dark:text-primary-400">
+                            ${product.price ? Number(product.price).toFixed(2) : '0.00'}
+                          </span>
+                          {product.id % 5 === 0 && (
+                            <span className="text-xs text-gray-400 line-through">
+                              ${(product.price * 1.25).toFixed(2)}
+                            </span>
+                          )}
+                        </div>
                         <button
                           onClick={() => handleAddToCart(product)}
-                          disabled={product.stockQuantity === 0}
+                          disabled={product.quantity === 0}
                           className="btn-primary-3d p-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           <FaShoppingCart />

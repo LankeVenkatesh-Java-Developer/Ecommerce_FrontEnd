@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaCreditCard, FaTruck, FaMapMarkerAlt } from 'react-icons/fa';
+import { FaCreditCard, FaTruck, FaMapMarkerAlt, FaMoneyBillWave } from 'react-icons/fa';
 import { useSelector } from 'react-redux';
 import { cartService } from '../services/cartService';
 import { userService } from '../services/userService';
@@ -217,7 +217,13 @@ const Checkout = () => {
                   checked={paymentMethod === 'card'}
                   onChange={(e) => setPaymentMethod(e.target.value)}
                 />
-                <span>Credit/Debit Card</span>
+                <div className="payment-icon">
+                  <FaCreditCard />
+                </div>
+                <div className="payment-info">
+                  <span className="payment-label">Credit/Debit Card</span>
+                  <span className="payment-desc">Pay securely with your card</span>
+                </div>
               </label>
               <label className={`payment-option ${paymentMethod === 'cod' ? 'selected' : ''}`}>
                 <input
@@ -227,7 +233,13 @@ const Checkout = () => {
                   checked={paymentMethod === 'cod'}
                   onChange={(e) => setPaymentMethod(e.target.value)}
                 />
-                <span>Cash on Delivery</span>
+                <div className="payment-icon">
+                  <FaMoneyBillWave />
+                </div>
+                <div className="payment-info">
+                  <span className="payment-label">Cash on Delivery</span>
+                  <span className="payment-desc">Pay when you receive</span>
+                </div>
               </label>
             </div>
 
@@ -289,6 +301,16 @@ const Checkout = () => {
           <div className="summary-items">
             {cart.items.map((item) => (
               <div key={item.productId} className="summary-item">
+                <div className="item-image-wrapper">
+                  <img 
+                    src={item.imageUrl || 'https://via.placeholder.com/60?text=Product'} 
+                    alt={item.name}
+                    className="item-thumb"
+                    onError={(e) => {
+                      e.target.src = 'https://via.placeholder.com/60?text=Product';
+                    }}
+                  />
+                </div>
                 <div className="item-info">
                   <span className="item-name">{item.name}</span>
                   <span className="item-qty">x{item.quantity}</span>

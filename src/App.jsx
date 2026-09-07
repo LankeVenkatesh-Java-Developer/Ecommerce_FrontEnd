@@ -24,6 +24,7 @@ import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import Profile from './pages/Profile';
 import NotFound from './pages/NotFound';
+import Unauthorized from './pages/Unauthorized';
 
 // Admin Pages
 import Dashboard from './pages/admin/Dashboard';
@@ -161,7 +162,7 @@ function App() {
                         <Route
                             path="/admin"
                             element={
-                                <ProtectedRoute>
+                                <ProtectedRoute requireAdmin>
                                     <AdminLayout>
                                         <Dashboard />
                                     </AdminLayout>
@@ -172,7 +173,7 @@ function App() {
                         <Route
                             path="/admin/categories"
                             element={
-                                <ProtectedRoute>
+                                <ProtectedRoute requireAdmin>
                                     <AdminLayout>
                                         <Categories />
                                     </AdminLayout>
@@ -183,7 +184,7 @@ function App() {
                         <Route
                             path="/admin/products"
                             element={
-                                <ProtectedRoute>
+                                <ProtectedRoute requireAdmin>
                                     <AdminLayout>
                                         <AdminProducts />
                                     </AdminLayout>
@@ -194,7 +195,7 @@ function App() {
                         <Route
                             path="/admin/reports"
                             element={
-                                <ProtectedRoute>
+                                <ProtectedRoute requireAdmin>
                                     <AdminLayout>
                                         <Reports />
                                     </AdminLayout>
@@ -203,6 +204,15 @@ function App() {
                         />
 
                         {/* ================= 404 ================= */}
+
+                        <Route
+                            path="/unauthorized"
+                            element={
+                                <MainLayout>
+                                    <Unauthorized />
+                                </MainLayout>
+                            }
+                        />
 
                         <Route
                             path="/404"

@@ -14,40 +14,51 @@ const Products = () => {
   const [showModal, setShowModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
 
   const [filters, setFilters] = useState({
     search: '',
     categoryId: '',
     status: '',
+    minPrice: '',
+    maxPrice: '',
   });
 
   const [formData, setFormData] = useState({
     name: '',
     description: '',
     price: '',
-    stockQuantity: '',
+    quantity: '',
     categoryId: '',
     brand: '',
-    imageUrl: '',
     sku: '',
+    status: 'ACTIVE',
   });
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [page]);
 
   const fetchData = async () => {
     setLoading(true);
+    setError('');
     try {
+      console.log('Admin Products: Fetching data from Products Service (admin endpoints)...');
       const [productsData, categoriesData] = await Promise.all([
-        productService.getAllProducts({ pageSize: 100 }),
-        productService.getAllCategories(),
+        productService.getAllProductsAdmin({ page, size: 20, sort: 'name,asc' }),
+        productService.getAllCategoriesAdmin(),
       ]);
-      setProducts(productsData.products);
-      setCategories(categoriesData);
+      console.log('Admin Products: productsData', productsData);
+      console.log('Admin Products: categoriesData', categoriesData);
+      setProducts(productsData.content || productsData || []);
+      setCategories(Array.isArray(categoriesData) ? categoriesData : []);
+      setTotalPages(productsData.totalPages || productsData.pageable?.totalPages || 0);
     } catch (err) {
-      const errorMessage = err.response?.data?.message || err.message || 'Failed to fetch data';
+      console.error('Admin Products: Error fetching data', err);
+      const errorMessage = err.message || 'Failed to fetch data';
       setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -57,13 +68,40 @@ const Products = () => {
     setFilters({ ...filters, [e.target.name]: e.target.value });
   };
 
-  const filteredProducts = products.filter((product) => {
-    const matchesSearch = product.name.toLowerCase().includes(filters.search.toLowerCase()) ||
-                         product.brand.toLowerCase().includes(filters.search.toLowerCase());
-    const matchesCategory = !filters.categoryId || product.categoryId === parseInt(filters.categoryId);
-    const matchesStatus = !filters.status || product.status === filters.status;
-    return matchesSearch && matchesCategory && matchesStatus;
-  });
+  const handleSearch = async () => {
+    setLoading(true);
+    try {
+      const searchParams = {
+        page: 0,
+        size: 20,
+      };
+      if (filters.search) searchParams.search = filters.search;
+      if (filters.categoryId && filters.categoryId !== '') searchParams.categoryId = filters.categoryId;
+      if (filters.status) searchParams.status = filters.status;
+
+      const response = await productService.getAllProducts(searchParams);
+      setProducts(response.content || []);
+      setTotalPages(response.totalPages || 0);
+      setPage(0);
+    } catch (err) {
+      const errorMessage = err.message || 'Failed to search products';
+      setError(errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResetFilters = () => {
+    setFilters({
+      search: '',
+      categoryId: '',
+      status: '',
+      minPrice: '',
+      maxPrice: '',
+    });
+    setPage(0);
+    fetchData();
+  };
 
   const handleAddProduct = () => {
     setEditingProduct(null);
@@ -71,11 +109,11 @@ const Products = () => {
       name: '',
       description: '',
       price: '',
-      stockQuantity: '',
+      quantity: '',
       categoryId: '',
       brand: '',
-      imageUrl: '',
       sku: '',
+      status: 'ACTIVE',
     });
     setShowModal(true);
   };
@@ -86,11 +124,11 @@ const Products = () => {
       name: product.name,
       description: product.description || '',
       price: product.price,
-      stockQuantity: product.stockQuantity,
+      quantity: product.quantity,
       categoryId: product.categoryId || '',
       brand: product.brand,
-      imageUrl: product.imageUrl,
       sku: product.sku,
+      status: product.status || 'ACTIVE',
     });
     setShowModal(true);
   };
@@ -103,7 +141,40 @@ const Products = () => {
       toast.success('Product deleted successfully');
       fetchData();
     } catch (err) {
-      const errorMessage = err.response?.data?.message || err.message || 'Failed to delete product';
+      const errorMessage = err.message || 'Failed to delete product';
+      toast.error(errorMessage);
+    }
+  };
+
+  const handleStatusToggle = async (productId, currentStatus) => {
+    const newStatus = currentStatus === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
+    try {
+      await productService.updateProductStatus(productId, newStatus);
+      toast.success(`Product ${newStatus.toLowerCase()} successfully`);
+      fetchData();
+    } catch (err) {
+      const errorMessage = err.message || 'Failed to update product status';
+      toast.error(errorMessage);
+    }
+  };
+
+  const handleStockUpdate = async (productId, currentStock) => {
+    const newStock = prompt('Enter new stock quantity:', currentStock);
+    if (newStock === null || newStock === '') return;
+    
+    const quantity = parseInt(newStock);
+    if (isNaN(quantity) || quantity < 0) {
+      toast.error('Please enter a valid stock quantity');
+      return;
+    }
+
+    try {
+      const product = await productService.getProductById(productId);
+      await productService.updateProduct(productId, { ...product, quantity: quantity });
+      toast.success('Stock updated successfully');
+      fetchData();
+    } catch (err) {
+      const errorMessage = err.message || 'Failed to update stock';
       toast.error(errorMessage);
     }
   };
@@ -120,7 +191,7 @@ const Products = () => {
       const productData = {
         ...formData,
         price: parseFloat(formData.price),
-        stockQuantity: parseInt(formData.stockQuantity),
+        quantity: parseInt(formData.quantity),
         categoryId: parseInt(formData.categoryId),
       };
 
@@ -134,7 +205,7 @@ const Products = () => {
       setShowModal(false);
       fetchData();
     } catch (err) {
-      const errorMessage = err.response?.data?.message || err.message || 'Failed to save product';
+      const errorMessage = err.message || 'Failed to save product';
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -143,6 +214,7 @@ const Products = () => {
   };
 
   if (loading) {
+    console.log('Admin Products: Still loading...');
     return <Loading />;
   }
 
@@ -186,8 +258,37 @@ const Products = () => {
             <option value="">All Status</option>
             <option value="ACTIVE">Active</option>
             <option value="INACTIVE">Inactive</option>
+            <option value="OUT_OF_STOCK">Out of Stock</option>
           </select>
         </div>
+        <div className="filter-group">
+          <input
+            type="number"
+            name="minPrice"
+            value={filters.minPrice}
+            onChange={handleFilterChange}
+            placeholder="Min Price"
+            min="0"
+            step="0.01"
+          />
+        </div>
+        <div className="filter-group">
+          <input
+            type="number"
+            name="maxPrice"
+            value={filters.maxPrice}
+            onChange={handleFilterChange}
+            placeholder="Max Price"
+            min="0"
+            step="0.01"
+          />
+        </div>
+        <button className="btn btn-secondary" onClick={handleSearch}>
+          Search
+        </button>
+        <button className="btn btn-secondary" onClick={handleResetFilters}>
+          Reset
+        </button>
       </div>
 
       {/* Products Table */}
@@ -195,10 +296,11 @@ const Products = () => {
         <table className="products-table">
           <thead>
             <tr>
-              <th>Image</th>
+              <th>ID</th>
               <th>Name</th>
               <th>SKU</th>
               <th>Category</th>
+              <th>Brand</th>
               <th>Price</th>
               <th>Stock</th>
               <th>Status</th>
@@ -206,27 +308,30 @@ const Products = () => {
             </tr>
           </thead>
           <tbody>
-            {filteredProducts.map((product) => (
+            {products.map((product) => (
               <tr key={product.id}>
-                <td>
-                  <img src={product.imageUrl} alt={product.name} className="product-thumb" />
-                </td>
+                <td>{product.id}</td>
                 <td>
                   <div className="product-name-cell">
                     <span className="product-name">{product.name}</span>
-                    <span className="product-brand">{product.brand}</span>
                   </div>
                 </td>
                 <td>{product.sku}</td>
-                <td>{categories.find((c) => c.id === product.categoryId)?.name || '-'}</td>
-                <td>${product.price.toFixed(2)}</td>
+                <td>{product.category?.name || product.categoryName || categories.find((c) => c.id === product.categoryId)?.name || '-'}</td>
+                <td>{product.brand}</td>
+                <td>${product.price ? Number(product.price).toFixed(2) : '0.00'}</td>
                 <td>
-                  <span className={product.stockQuantity > 10 ? 'stock-ok' : 'stock-low'}>
-                    {product.stockQuantity}
+                  <span 
+                    className={product.quantity > 10 ? 'stock-ok' : 'stock-low'}
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => handleStockUpdate(product.id, product.quantity)}
+                    title="Click to update stock"
+                  >
+                    {product.quantity}
                   </span>
                 </td>
                 <td>
-                  <span className={`status-badge ${product.status.toLowerCase()}`}>
+                  <span className={`status-badge ${product.status?.toLowerCase()}`}>
                     {product.status}
                   </span>
                 </td>
@@ -238,6 +343,13 @@ const Products = () => {
                       title="Edit"
                     >
                       <FaEdit />
+                    </button>
+                    <button
+                      className="btn-icon"
+                      onClick={() => handleStatusToggle(product.id, product.status)}
+                      title="Toggle Status"
+                    >
+                      {product.status === 'ACTIVE' ? '🔴' : '🟢'}
                     </button>
                     <button
                       className="btn-icon btn-icon-danger"
@@ -252,10 +364,31 @@ const Products = () => {
             ))}
           </tbody>
         </table>
-        {filteredProducts.length === 0 && (
+        {products.length === 0 && (
           <div className="empty-state">No products found matching your criteria.</div>
         )}
       </div>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="pagination">
+          <button
+            className="btn btn-secondary"
+            onClick={() => setPage(p => Math.max(0, p - 1))}
+            disabled={page === 0}
+          >
+            Previous
+          </button>
+          <span>Page {page + 1} of {totalPages}</span>
+          <button
+            className="btn btn-secondary"
+            onClick={() => setPage(p => p + 1)}
+            disabled={page >= totalPages - 1}
+          >
+            Next
+          </button>
+        </div>
+      )}
 
       {showModal && (
         <div className="modal-overlay" onClick={() => setShowModal(false)}>
@@ -278,6 +411,7 @@ const Products = () => {
                     placeholder="Enter product name"
                     required
                     disabled={saving}
+                    maxLength={200}
                   />
                 </div>
                 <div className="form-group">
@@ -290,6 +424,7 @@ const Products = () => {
                     placeholder="Enter SKU"
                     required
                     disabled={saving}
+                    maxLength={50}
                   />
                 </div>
               </div>
@@ -304,6 +439,7 @@ const Products = () => {
                     placeholder="Enter brand"
                     required
                     disabled={saving}
+                    maxLength={100}
                   />
                 </div>
                 <div className="form-group">
@@ -316,7 +452,7 @@ const Products = () => {
                     disabled={saving}
                   >
                     <option value="">Select category</option>
-                    {categories.map((cat) => (
+                    {categories.filter(c => !c.status || c.status === 'ACTIVE').map((cat) => (
                       <option key={cat.id} value={cat.id}>
                         {cat.name}
                       </option>
@@ -343,8 +479,8 @@ const Products = () => {
                   <label>Stock Quantity *</label>
                   <input
                     type="number"
-                    name="stockQuantity"
-                    value={formData.stockQuantity}
+                    name="quantity"
+                    value={formData.quantity}
                     onChange={handleChange}
                     placeholder="0"
                     min="0"
@@ -352,6 +488,19 @@ const Products = () => {
                     disabled={saving}
                   />
                 </div>
+              </div>
+              <div className="form-group">
+                <label>Status</label>
+                <select
+                  name="status"
+                  value={formData.status}
+                  onChange={handleChange}
+                  disabled={saving}
+                >
+                  <option value="ACTIVE">Active</option>
+                  <option value="INACTIVE">Inactive</option>
+                  <option value="OUT_OF_STOCK">Out of Stock</option>
+                </select>
               </div>
               <div className="form-group">
                 <label>Description</label>
@@ -362,17 +511,7 @@ const Products = () => {
                   placeholder="Enter product description"
                   rows={4}
                   disabled={saving}
-                />
-              </div>
-              <div className="form-group">
-                <label>Image URL</label>
-                <input
-                  type="url"
-                  name="imageUrl"
-                  value={formData.imageUrl}
-                  onChange={handleChange}
-                  placeholder="Enter image URL"
-                  disabled={saving}
+                  maxLength={1000}
                 />
               </div>
               <div className="modal-actions">

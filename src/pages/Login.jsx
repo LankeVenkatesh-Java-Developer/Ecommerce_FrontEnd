@@ -6,10 +6,11 @@ import { authService } from '../services/authService';
 import Loading from '../components/Loading';
 import ErrorMessage from '../components/ErrorMessage';
 import { toast } from 'react-toastify';
+import { setToken, setRole, setUser } from '../utils/tokenUtils';
 
 const Login = () => {
   const [formData, setFormData] = useState({
-    email: '',
+    emailOrMobile: '',
     password: '',
   });
   const [error, setError] = useState('');
@@ -36,15 +37,30 @@ const Login = () => {
 
       const response = await authService.login(formData);
 
+      // Store token, user, and role in localStorage from login response
+      setToken(response.token);
+      setUser({ id: response.userId, email: response.email });
+      setRole(response.role);
+
       dispatch(
         loginSuccess({
-          user: { id: response.userId, email: response.email },
-          token: response.accessToken,
+          user: { 
+            id: response.userId, 
+            email: response.email,
+            role: response.role
+          },
+          token: response.token,
         })
       );
 
       toast.success('Login successful!');
-      navigate('/');
+      
+      // Redirect based on role
+      if (response.role === 'ADMIN' || response.role === 'SUPER_ADMIN') {
+        navigate('/admin');
+      } else {
+        navigate('/');
+      }
     } catch (err) {
       const errorMessage = err.response?.data?.message || err.message || 'Login failed';
       setError(errorMessage);
@@ -72,12 +88,12 @@ const Login = () => {
             </label>
             <input
               type="email"
-              id="email"
-              name="email"
-              value={formData.email}
+              id="emailOrMobile"
+              name="emailOrMobile"
+              value={formData.emailOrMobile}
               onChange={handleChange}
               required
-              placeholder="Enter your email"
+              placeholder="Enter your email or mobile"
               disabled={loading}
               className="input-3d"
             />

@@ -1,15 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { FaBox, FaShoppingCart, FaUsers, FaDollarSign, FaArrowUp, FaArrowDown } from 'react-icons/fa';
-import { orderService } from '../../services/orderService';
+import { FaBox, FaShoppingCart, FaUsers, FaDollarSign, FaArrowUp, FaArrowDown, FaTags, FaChartBar } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
 import { productService } from '../../services/productService';
 import Loading from '../../components/Loading';
 import './Dashboard.css';
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const [stats, setStats] = useState({
     totalOrders: 0,
     totalRevenue: 0,
     totalProducts: 0,
+    totalCategories: 0,
+    totalStock: 0,
     totalUsers: 0,
   });
   const [recentOrders, setRecentOrders] = useState([]);
@@ -22,23 +25,36 @@ const Dashboard = () => {
   const fetchDashboardData = async () => {
     setLoading(true);
     try {
-      const [ordersData, productsData] = await Promise.all([
-        orderService.getOrders(0), // Get all orders for demo
-        productService.getAllProducts({ pageSize: 1 }),
+      const [productsData, categoriesData] = await Promise.all([
+        productService.getAllProductsAdmin({ page: 0, size: 100, sort: 'name,asc' }),
+        productService.getAllCategoriesAdmin(),
       ]);
-
-      const totalRevenue = ordersData.reduce((sum, order) => sum + order.total, 0);
+      
+      const products = productsData.content || productsData || [];
+      const totalProducts = products.length;
+      const totalStock = products.reduce((sum, product) => sum + (product.quantity || 0), 0);
+      const totalCategories = Array.isArray(categoriesData) ? categoriesData.length : categoriesData.content?.length || 0;
 
       setStats({
-        totalOrders: ordersData.length,
-        totalRevenue,
-        totalProducts: productsData.total,
-        totalUsers: 150, // Mock value
+        totalOrders: 0, // Orders not available yet
+        totalRevenue: 0, // Revenue not available yet
+        totalProducts: totalProducts,
+        totalCategories: totalCategories,
+        totalStock: totalStock,
+        totalUsers: 1, // Current admin user
       });
 
-      setRecentOrders(ordersData.slice(0, 5));
+      setRecentOrders([]); // No orders available yet
     } catch (err) {
       console.error('Failed to fetch dashboard data:', err);
+      setStats({
+        totalOrders: 0,
+        totalRevenue: 0,
+        totalProducts: 0,
+        totalCategories: 0,
+        totalStock: 0,
+        totalUsers: 1,
+      });
     } finally {
       setLoading(false);
     }
@@ -90,6 +106,32 @@ const Dashboard = () => {
             <p className="stat-value">{stats.totalProducts}</p>
             <span className="stat-change positive">
               <FaArrowUp /> 5.1%
+            </span>
+          </div>
+        </div>
+
+        <div className="stat-card">
+          <div className="stat-icon categories">
+            <FaTags />
+          </div>
+          <div className="stat-content">
+            <h3>Total Categories</h3>
+            <p className="stat-value">{stats.totalCategories}</p>
+            <span className="stat-change positive">
+              <FaArrowUp /> 3.2%
+            </span>
+          </div>
+        </div>
+
+        <div className="stat-card">
+          <div className="stat-icon stock">
+            <FaBox />
+          </div>
+          <div className="stat-content">
+            <h3>Total Stock</h3>
+            <p className="stat-value">{stats.totalStock}</p>
+            <span className="stat-change positive">
+              <FaArrowUp /> 7.8%
             </span>
           </div>
         </div>
@@ -148,15 +190,15 @@ const Dashboard = () => {
       <div className="dashboard-section">
         <h2>Quick Actions</h2>
         <div className="quick-actions">
-          <button className="action-btn">
+          <button className="action-btn" onClick={() => navigate('/admin/products')}>
             <FaBox />
             <span>Add New Product</span>
           </button>
-          <button className="action-btn">
+          <button className="action-btn" onClick={() => navigate('/admin/categories')}>
             <FaTags />
             <span>Add Category</span>
           </button>
-          <button className="action-btn">
+          <button className="action-btn" onClick={() => navigate('/admin/reports')}>
             <FaChartBar />
             <span>Generate Report</span>
           </button>

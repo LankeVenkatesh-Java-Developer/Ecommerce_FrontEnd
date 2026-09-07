@@ -131,11 +131,47 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-md);
-  padding: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
   border: 2px solid var(--border-color);
   border-radius: var(--radius-lg);
   cursor: pointer;
   transition: all var(--transition-base);
+}
+
+.payment-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  font-size: 1.5rem;
+  color: var(--text-secondary);
+  transition: all var(--transition-base);
+}
+
+.payment-option.selected .payment-icon {
+  background: var(--primary-color);
+  color: white;
+}
+
+.payment-info {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  flex: 1;
+}
+
+.payment-label {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.payment-desc {
+  font-size: 0.875rem;
+  color: var(--text-muted);
 }
 
 .payment-option:hover {
@@ -224,15 +260,29 @@
 
 .summary-item {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  gap: var(--spacing-md);
   padding: var(--spacing-sm) 0;
+}
+
+.item-image-wrapper {
+  flex-shrink: 0;
+}
+
+.item-thumb {
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
 }
 
 .item-info {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-xs);
+  flex: 1;
+  min-width: 0;
 }
 
 .item-name {
@@ -377,5 +427,51 @@
 
   .form-row {
     grid-template-columns: 1fr;
+  }
+
+  .payment-option {
+    padding: var(--spacing-md);
+  }
+
+  .payment-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 1.25rem;
+  }
+
+  .summary-item {
+    gap: var(--spacing-sm);
+  }
+
+  .item-thumb {
+    width: 50px;
+    height: 50px;
+  }
+}
+
+@media (max-width: 480px) {
+  .checkout-container h1 {
+    font-size: 1.75rem;
+  }
+
+  .checkout-section {
+    padding: var(--spacing-md);
+  }
+
+  .payment-option {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--spacing-sm);
+  }
+
+  .payment-icon {
+    width: 36px;
+    height: 36px;
+    font-size: 1.1rem;
+  }
+
+  .item-thumb {
+    width: 45px;
+    height: 45px;
   }
 }

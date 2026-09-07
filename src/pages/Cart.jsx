@@ -138,9 +138,12 @@ const Cart = () => {
                 <div className="flex flex-col sm:flex-row gap-4">
                   <div className="flex-shrink-0">
                     <img 
-                      src={item.imageUrl} 
+                      src={item.imageUrl || 'https://via.placeholder.com/100?text=Product'} 
                       alt={item.name} 
                       className="w-24 h-24 object-cover rounded-lg"
+                      onError={(e) => {
+                        e.target.src = 'https://via.placeholder.com/100?text=Product';
+                      }}
                     />
                   </div>
                   <div className="flex-1">

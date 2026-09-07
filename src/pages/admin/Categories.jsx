@@ -13,25 +13,33 @@ const Categories = () => {
   const [showModal, setShowModal] = useState(false);
   const [editingCategory, setEditingCategory] = useState(null);
   const [saving, setSaving] = useState(false);
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
 
   const [formData, setFormData] = useState({
     name: '',
     description: '',
-    imageUrl: '',
+    status: 'ACTIVE',
   });
 
   useEffect(() => {
     fetchCategories();
-  }, []);
+  }, [page]);
 
   const fetchCategories = async () => {
     setLoading(true);
+    setError('');
     try {
-      const data = await productService.getAllCategories();
-      setCategories(data);
+      console.log('Admin Categories: Fetching data from Products Service (admin endpoint)...');
+      const response = await productService.getAllCategoriesAdmin();
+      console.log('Admin Categories: response', response);
+      setCategories(Array.isArray(response) ? response : response.content || []);
+      setTotalPages(0); // Admin Service doesn't paginate categories
     } catch (err) {
-      const errorMessage = err.response?.data?.message || err.message || 'Failed to fetch categories';
+      console.error('Admin Categories: Error fetching data', err);
+      const errorMessage = err.message || 'Failed to fetch categories';
       setError(errorMessage);
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -42,7 +50,7 @@ const Categories = () => {
     setFormData({
       name: '',
       description: '',
-      imageUrl: '',
+      status: 'ACTIVE',
     });
     setShowModal(true);
   };
@@ -52,7 +60,7 @@ const Categories = () => {
     setFormData({
       name: category.name,
       description: category.description || '',
-      imageUrl: category.imageUrl || '',
+      status: category.status || 'ACTIVE',
     });
     setShowModal(true);
   };
@@ -65,7 +73,19 @@ const Categories = () => {
       toast.success('Category deleted successfully');
       fetchCategories();
     } catch (err) {
-      const errorMessage = err.response?.data?.message || err.message || 'Failed to delete category';
+      const errorMessage = err.message || 'Failed to delete category';
+      toast.error(errorMessage);
+    }
+  };
+
+  const handleStatusToggle = async (categoryId, currentStatus) => {
+    const newStatus = currentStatus === 'ACTIVE' ? 'INACTIVE' : 'ACTIVE';
+    try {
+      await productService.updateCategory(categoryId, { status: newStatus });
+      toast.success(`Category ${newStatus.toLowerCase()} successfully`);
+      fetchCategories();
+    } catch (err) {
+      const errorMessage = err.message || 'Failed to update category status';
       toast.error(errorMessage);
     }
   };
@@ -89,7 +109,7 @@ const Categories = () => {
       setShowModal(false);
       fetchCategories();
     } catch (err) {
-      const errorMessage = err.response?.data?.message || err.message || 'Failed to save category';
+      const errorMessage = err.message || 'Failed to save category';
       setError(errorMessage);
       toast.error(errorMessage);
     } finally {
@@ -113,41 +133,82 @@ const Categories = () => {
 
       {error && <ErrorMessage message={error} onDismiss={() => setError('')} />}
 
-      <div className="categories-grid">
-        {categories.map((category) => (
-          <div key={category.id} className="category-card">
-            <div className="category-image">
-              <img src={category.imageUrl} alt={category.name} />
-            </div>
-            <div className="category-info">
-              <h3>{category.name}</h3>
-              <p className="category-description">
-                {category.description || 'No description'}
-              </p>
-              <div className="category-actions">
-                <button
-                  className="btn-icon"
-                  onClick={() => handleEditCategory(category)}
-                  title="Edit"
-                >
-                  <FaEdit />
-                </button>
-                <button
-                  className="btn-icon btn-icon-danger"
-                  onClick={() => handleDeleteCategory(category.id)}
-                  title="Delete"
-                >
-                  <FaTrash />
-                </button>
-              </div>
-            </div>
-          </div>
-        ))}
+      <div className="categories-table-container">
+        <table className="categories-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Description</th>
+              <th>Status</th>
+              <th>Created</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {categories.map((category) => (
+              <tr key={category.id}>
+                <td>{category.id}</td>
+                <td>{category.name}</td>
+                <td>{category.description || 'No description'}</td>
+                <td>
+                  <span className={`status-badge ${category.status?.toLowerCase()}`}>
+                    {category.status}
+                  </span>
+                </td>
+                <td>{new Date(category.createdAt).toLocaleDateString()}</td>
+                <td>
+                  <div className="table-actions">
+                    <button
+                      className="btn-icon"
+                      onClick={() => handleEditCategory(category)}
+                      title="Edit"
+                    >
+                      <FaEdit />
+                    </button>
+                    <button
+                      className="btn-icon"
+                      onClick={() => handleStatusToggle(category.id, category.status)}
+                      title="Toggle Status"
+                    >
+                      {category.status === 'ACTIVE' ? '🔴' : '🟢'}
+                    </button>
+                    <button
+                      className="btn-icon btn-icon-danger"
+                      onClick={() => handleDeleteCategory(category.id)}
+                      title="Delete"
+                    >
+                      <FaTrash />
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {categories.length === 0 && (
+          <div className="empty-state">No categories found. Add your first category to get started.</div>
+        )}
       </div>
 
-      {categories.length === 0 && (
-        <div className="empty-state">
-          <p>No categories found. Add your first category to get started.</p>
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="pagination">
+          <button
+            className="btn btn-secondary"
+            onClick={() => setPage(p => Math.max(0, p - 1))}
+            disabled={page === 0}
+          >
+            Previous
+          </button>
+          <span>Page {page + 1} of {totalPages}</span>
+          <button
+            className="btn btn-secondary"
+            onClick={() => setPage(p => p + 1)}
+            disabled={page >= totalPages - 1}
+          >
+            Next
+          </button>
         </div>
       )}
 
@@ -171,6 +232,7 @@ const Categories = () => {
                   placeholder="Enter category name"
                   required
                   disabled={saving}
+                  maxLength={100}
                 />
               </div>
               <div className="form-group">
@@ -182,18 +244,20 @@ const Categories = () => {
                   placeholder="Enter category description"
                   rows={3}
                   disabled={saving}
+                  maxLength={500}
                 />
               </div>
               <div className="form-group">
-                <label>Image URL</label>
-                <input
-                  type="url"
-                  name="imageUrl"
-                  value={formData.imageUrl}
+                <label>Status</label>
+                <select
+                  name="status"
+                  value={formData.status}
                   onChange={handleChange}
-                  placeholder="Enter image URL"
                   disabled={saving}
-                />
+                >
+                  <option value="ACTIVE">Active</option>
+                  <option value="INACTIVE">Inactive</option>
+                </select>
               </div>
               <div className="modal-actions">
                 <button
