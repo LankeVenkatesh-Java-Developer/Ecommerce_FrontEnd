@@ -1,17 +1,22 @@
 const TOKEN_KEY = 'accessToken';
 const USER_KEY = 'user';
 const ROLE_KEY = 'userRole';
+const TOKEN_EXPIRY_KEY = 'tokenExpiry';
+const TOKEN_REFRESH_THRESHOLD = 5 * 60 * 1000; // 5 minutes before expiry
 
 export const getToken = () => {
   return localStorage.getItem(TOKEN_KEY);
 };
 
-export const setToken = (token) => {
+export const setToken = (token, expiresIn = 86400000) => {
   localStorage.setItem(TOKEN_KEY, token);
+  const expiryTime = Date.now() + expiresIn;
+  localStorage.setItem(TOKEN_EXPIRY_KEY, expiryTime.toString());
 };
 
 export const removeToken = () => {
   localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem(TOKEN_EXPIRY_KEY);
 };
 
 export const getUser = () => {
@@ -52,4 +57,21 @@ export const clearAuthData = () => {
   removeToken();
   removeUser();
   removeRole();
+};
+
+export const getTokenExpiry = () => {
+  const expiry = localStorage.getItem(TOKEN_EXPIRY_KEY);
+  return expiry ? parseInt(expiry, 10) : null;
+};
+
+export const isTokenExpiringSoon = () => {
+  const expiry = getTokenExpiry();
+  if (!expiry) return false;
+  return Date.now() >= expiry - TOKEN_REFRESH_THRESHOLD;
+};
+
+export const isTokenExpired = () => {
+  const expiry = getTokenExpiry();
+  if (!expiry) return false;
+  return Date.now() >= expiry;
 };

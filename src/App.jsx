@@ -32,12 +32,22 @@ import Categories from './pages/admin/Categories';
 import AdminProducts from './pages/admin/Products';
 import Reports from './pages/admin/Reports';
 
+// Test Page
+import ApiTestPage from './pages/ApiTestPage';
+
 function App() {
     return (
         <Provider store={store}>
             <ThemeProvider>
                 <Router>
                     <Routes>
+
+                        {/* ================= TEST PAGE ROUTE ================= */}
+
+                        <Route
+                            path="/api-test"
+                            element={<ApiTestPage />}
+                        />
 
                         {/* ================= USER ROUTES ================= */}
 
