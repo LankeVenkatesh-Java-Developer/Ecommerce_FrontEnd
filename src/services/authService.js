@@ -33,6 +33,11 @@ export const authService = {
     return response.data;
   },
 
+  verifyOtp: async (email, otp) => {
+    const response = await userApi.post(AUTH_ENDPOINTS.VERIFY_OTP, { email, otp });
+    return response.data;
+  },
+
   resetPassword: async (resetData) => {
     const response = await userApi.post(AUTH_ENDPOINTS.RESET_PASSWORD, resetData);
     return response.data;

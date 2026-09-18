@@ -3,7 +3,7 @@ import { Navigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import Loading from './Loading';
 
-const ProtectedRoute = ({ children, requireAdmin = false }) => {
+const ProtectedRoute = ({ children, requireAdmin = false, requireSuperAdmin = false }) => {
   const { isAuthenticated, loading, role } = useSelector((state) => state.auth);
 
   if (loading) {
@@ -14,8 +14,14 @@ const ProtectedRoute = ({ children, requireAdmin = false }) => {
     return <Navigate to="/login" replace />;
   }
 
+  if (requireSuperAdmin) {
+    if (role !== 'SUPER_ADMIN') {
+      return <Navigate to="/unauthorized" replace />;
+    }
+  }
+
   if (requireAdmin) {
-    const isAdminRole = role === 'ADMIN' || role === 'SUPER_ADMIN' || role === 'CUSTOMER';
+    const isAdminRole = role === 'ADMIN' || role === 'SUPER_ADMIN';
     if (!isAdminRole) {
       return <Navigate to="/unauthorized" replace />;
     }

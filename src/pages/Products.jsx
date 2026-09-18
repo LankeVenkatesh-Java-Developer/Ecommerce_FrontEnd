@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { FaShoppingCart, FaStar, FaFilter, FaSlidersH } from 'react-icons/fa';
+import { useSelector, useDispatch } from 'react-redux';
 import { productService } from '../services/productService';
 import Loading from '../components/Loading';
+import { ProductCardSkeleton } from '../components/SkeletonLoader';
 import ErrorMessage from '../components/ErrorMessage';
 import { toast } from 'react-toastify';
 import { cartService } from '../services/cartService';
+import { setCart } from '../store/slices/cartSlice';
 
 const Products = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -14,6 +17,8 @@ const Products = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [showFilters, setShowFilters] = useState(false);
+  const { user } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
 
   const [filters, setFilters] = useState({
     categoryId: searchParams.get('category') || '',
@@ -96,7 +101,9 @@ const Products = () => {
 
   const handleAddToCart = async (product) => {
     try {
-      await cartService.addToCart(null, product, 1);
+      await cartService.addToCart(user?.id, product, 1);
+      const updatedCart = await cartService.getCart(user?.id);
+      dispatch(setCart(updatedCart));
       window.dispatchEvent(new Event('cartUpdated'));
       toast.success('Added to cart!');
     } catch (error) {
@@ -223,12 +230,27 @@ const Products = () => {
         {/* Products Grid */}
         <main className="flex-1">
           {loading ? (
-            <Loading />
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[...Array(12)].map((_, i) => (
+                <ProductCardSkeleton key={i} />
+              ))}
+            </div>
           ) : products.length === 0 ? (
-            <div className="card-3d p-12 text-center">
-              <p className="text-gray-600 dark:text-gray-400 mb-4">No products found matching your criteria.</p>
-              <button className="btn-primary-3d" onClick={clearFilters}>
-                Clear Filters
+            <div className="card-3d p-16 text-center">
+              <div className="w-24 h-24 mx-auto mb-6 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center">
+                <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">No Products Found</h3>
+              <p className="text-gray-600 dark:text-gray-400 mb-6 max-w-md mx-auto">
+                We couldn't find any products matching your search criteria. Try adjusting your filters or search terms.
+              </p>
+              <button className="btn-primary-3d inline-flex items-center" onClick={clearFilters}>
+                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Clear All Filters
               </button>
             </div>
           ) : (
@@ -239,50 +261,74 @@ const Products = () => {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {products.map((product) => (
-                  <div key={product.id} className="card-3d group">
+                  <div key={product.id} className="card-3d group relative">
                     <Link to={`/products/${product.id}`} className="block relative overflow-hidden rounded-t-xl">
-                      <div className="aspect-square">
+                      <div className="aspect-square relative">
                         <img 
                           src={product.imageUrl} 
                           alt={product.name} 
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500 ease-out"
                         />
+                        {/* Quick Actions Overlay */}
+                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-2">
+                          <button
+                            onClick={(e) => {
+                              e.preventDefault();
+                              handleAddToCart(product);
+                            }}
+                            disabled={product.quantity === 0}
+                            className="bg-white text-gray-900 p-3 rounded-full hover:bg-primary-500 hover:text-white transition-all duration-300 transform hover:scale-110 disabled:opacity-50 disabled:cursor-not-allowed"
+                            title="Add to Cart"
+                          >
+                            <FaShoppingCart />
+                          </button>
+                        </div>
                       </div>
                       {/* Badges */}
                       <div className="absolute top-2 left-2 flex flex-col gap-1">
                         {product.quantity === 0 && (
-                          <span className="bg-red-500 text-white text-xs font-semibold px-2 py-1 rounded-lg">Out of Stock</span>
+                          <span className="bg-red-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg animate-pulse">Out of Stock</span>
                         )}
                         {product.quantity > 0 && product.quantity < 10 && (
-                          <span className="bg-orange-500 text-white text-xs font-semibold px-2 py-1 rounded-lg">Low Stock</span>
+                          <span className="bg-orange-500 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">Low Stock</span>
                         )}
                         {product.id % 3 === 0 && product.quantity > 0 && (
-                          <span className="bg-accent-500 text-white text-xs font-semibold px-2 py-1 rounded-lg">New</span>
+                          <span className="bg-gradient-to-r from-accent-500 to-accent-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">New</span>
                         )}
                         {product.id % 5 === 0 && product.quantity > 0 && (
-                          <span className="bg-secondary-500 text-white text-xs font-semibold px-2 py-1 rounded-lg">-20%</span>
+                          <span className="bg-gradient-to-r from-secondary-500 to-secondary-600 text-white text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">-20%</span>
                         )}
                       </div>
+                      {/* Wishlist Button */}
+                      <button className="absolute top-2 right-2 bg-white/90 dark:bg-gray-800/90 p-2 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-300 hover:bg-red-500 hover:text-white transform hover:scale-110">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                        </svg>
+                      </button>
                     </Link>
                     <div className="p-4">
                       <Link to={`/products/${product.id}`} className="block">
-                        <h3 className="font-semibold text-gray-900 dark:text-white mb-1 line-clamp-2 hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
+                        <h3 className="font-semibold text-gray-900 dark:text-white mb-1 line-clamp-2 hover:text-primary-600 dark:hover:text-primary-400 transition-colors text-lg">
                           {product.name}
                         </h3>
                       </Link>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">{product.brand}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 mb-2 font-medium">{product.brand}</p>
                       <div className="flex items-center mb-3">
-                        <FaStar className="text-yellow-400 mr-1" />
-                        <span className="text-sm font-medium text-gray-900 dark:text-white">{product.rating}</span>
+                        <div className="flex">
+                          {[...Array(5)].map((_, i) => (
+                            <FaStar key={i} className={`text-sm ${i < Math.floor(product.rating) ? 'text-yellow-400' : 'text-gray-300'}`} />
+                          ))}
+                        </div>
+                        <span className="text-sm font-medium text-gray-900 dark:text-white ml-2">{product.rating}</span>
                         <span className="text-sm text-gray-500 dark:text-gray-400 ml-1">({product.reviews})</span>
                       </div>
                       <div className="flex items-center justify-between">
                         <div className="flex flex-col">
-                          <span className="text-xl font-bold text-primary-600 dark:text-primary-400">
+                          <span className="text-2xl font-bold text-primary-600 dark:text-primary-400">
                             ${product.price ? Number(product.price).toFixed(2) : '0.00'}
                           </span>
                           {product.id % 5 === 0 && (
-                            <span className="text-xs text-gray-400 line-through">
+                            <span className="text-sm text-gray-400 line-through font-medium">
                               ${(product.price * 1.25).toFixed(2)}
                             </span>
                           )}
@@ -290,7 +336,7 @@ const Products = () => {
                         <button
                           onClick={() => handleAddToCart(product)}
                           disabled={product.quantity === 0}
-                          className="btn-primary-3d p-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="btn-primary-3d p-3 rounded-xl disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 transition-transform"
                         >
                           <FaShoppingCart />
                         </button>

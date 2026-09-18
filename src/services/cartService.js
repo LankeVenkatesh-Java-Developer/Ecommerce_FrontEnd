@@ -1,100 +1,68 @@
-// Placeholder service with mock data - to be replaced with real backend API calls
 import { CART_ENDPOINTS } from '../api/endpoints';
-
-// Mock cart data (stored in localStorage for persistence)
-const getCartFromStorage = () => {
-  const cart = localStorage.getItem('cart');
-  return cart ? JSON.parse(cart) : { items: [], total: 0 };
-};
-
-const saveCartToStorage = (cart) => {
-  localStorage.setItem('cart', JSON.stringify(cart));
-};
-
-const calculateTotal = (items) => {
-  return items.reduce((total, item) => total + (item.price * item.quantity), 0);
-};
+import { cartApi } from '../api/axiosConfig';
 
 export const cartService = {
   getCart: async (userId) => {
-    await new Promise(resolve => setTimeout(resolve, 200));
-    const cart = getCartFromStorage();
-    return cart;
+    const response = await cartApi.get(CART_ENDPOINTS.GET_CART(userId));
+    return response.data;
   },
 
   addToCart: async (userId, product, quantity = 1) => {
-    await new Promise(resolve => setTimeout(resolve, 300));
-    const cart = getCartFromStorage();
-
-    const existingItemIndex = cart.items.findIndex(item => item.productId === product.id);
-
-    if (existingItemIndex > -1) {
-      // Update quantity if item already exists
-      cart.items[existingItemIndex].quantity += quantity;
-    } else {
-      // Add new item
-      cart.items.push({
+    try {
+      const cartItem = {
         productId: product.id,
-        name: product.name,
-        price: product.price,
-        imageUrl: product.imageUrl,
         quantity: quantity,
-        stockQuantity: product.stockQuantity,
-      });
-    }
-
-    cart.total = calculateTotal(cart.items);
-    saveCartToStorage(cart);
-
-    return cart;
-  },
-
-  updateCartItem: async (userId, itemId, quantity) => {
-    await new Promise(resolve => setTimeout(resolve, 200));
-    const cart = getCartFromStorage();
-
-    const itemIndex = cart.items.findIndex(item => item.productId === itemId);
-
-    if (itemIndex > -1) {
-      if (quantity <= 0) {
-        // Remove item if quantity is 0 or less
-        cart.items.splice(itemIndex, 1);
-      } else {
-        // Update quantity
-        cart.items[itemIndex].quantity = quantity;
+      };
+      const response = await cartApi.post(CART_ENDPOINTS.ADD_TO_CART(userId), cartItem);
+      return response.data;
+    } catch (error) {
+      // Handle specific error messages from backend
+      const errorMessage = error.response?.data?.message || error.message;
+      if (errorMessage.includes('Product is not available')) {
+        throw new Error('This product is currently unavailable. Please try again later.');
       }
-
-      cart.total = calculateTotal(cart.items);
-      saveCartToStorage(cart);
+      if (errorMessage.includes('Insufficient stock')) {
+        throw new Error('Not enough stock available. Please reduce the quantity.');
+      }
+      if (errorMessage.includes('Unable to add item to cart')) {
+        throw new Error('Unable to add item to cart. Please try again later.');
+      }
+      throw error;
     }
-
-    return cart;
   },
 
-  removeCartItem: async (userId, itemId) => {
-    await new Promise(resolve => setTimeout(resolve, 200));
-    const cart = getCartFromStorage();
-
-    const itemIndex = cart.items.findIndex(item => item.productId === itemId);
-
-    if (itemIndex > -1) {
-      cart.items.splice(itemIndex, 1);
-      cart.total = calculateTotal(cart.items);
-      saveCartToStorage(cart);
+  updateCartItem: async (userId, productId, quantity) => {
+    try {
+      const response = await cartApi.put(
+        `${CART_ENDPOINTS.UPDATE_CART_ITEM(userId, productId)}?quantity=${quantity}`,
+        {}
+      );
+      return response.data;
+    } catch (error) {
+      // Handle specific error messages from backend
+      const errorMessage = error.response?.data?.message || error.message;
+      if (errorMessage.includes('Insufficient stock')) {
+        throw new Error('Not enough stock available. Please reduce the quantity.');
+      }
+      if (errorMessage.includes('Product is not available')) {
+        throw new Error('This product is currently unavailable. Please try again later.');
+      }
+      throw error;
     }
+  },
 
-    return cart;
+  removeCartItem: async (userId, productId) => {
+    const response = await cartApi.delete(CART_ENDPOINTS.REMOVE_CART_ITEM(userId, productId));
+    return response.data;
   },
 
   clearCart: async (userId) => {
-    await new Promise(resolve => setTimeout(resolve, 200));
-    const cart = { items: [], total: 0 };
-    saveCartToStorage(cart);
-    return cart;
+    const response = await cartApi.delete(CART_ENDPOINTS.CLEAR_CART(userId));
+    return response.data;
   },
 
-  getCartItemCount: () => {
-    const cart = getCartFromStorage();
-    return cart.items.reduce((count, item) => count + item.quantity, 0);
+  getAllCarts: async () => {
+    const response = await cartApi.get(CART_ENDPOINTS.GET_ALL_CARTS);
+    return response.data;
   },
 };

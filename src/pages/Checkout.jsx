@@ -42,9 +42,11 @@ const Checkout = () => {
     setLoading(true);
     try {
       const [cartData, addressesData] = await Promise.all([
-        cartService.getCart(null),
+        cartService.getCart(user.id),
         userService.getAddresses(user.id),
       ]);
+      console.log('Cart data:', cartData);
+      console.log('Cart items:', cartData?.items);
       setCart(cartData);
       setAddresses(addressesData);
 
@@ -55,6 +57,7 @@ const Checkout = () => {
         setSelectedAddress(addressesData[0].id);
       }
     } catch (err) {
+      console.error('Error fetching data:', err);
       const errorMessage = err.response?.data?.message || err.message || 'Failed to load data';
       setError(errorMessage);
     } finally {
@@ -104,7 +107,7 @@ const Checkout = () => {
       const shippingAddress = addresses.find((addr) => addr.id === selectedAddress);
 
       const orderData = {
-        userId: user.id,
+        customerId: user.id,
         items: cart.items.map((item) => ({
           productId: item.productId,
           quantity: item.quantity,
@@ -119,8 +122,10 @@ const Checkout = () => {
       };
 
       const order = await orderService.createOrder(orderData);
-      
-      await cartService.clearCart(null);
+
+      // Cart is automatically cleared by backend after successful order creation
+      // No need to manually clear cart
+      setCart({ items: [], total: 0 });
       window.dispatchEvent(new Event('cartUpdated'));
 
       toast.success('Order placed successfully!');
@@ -152,9 +157,9 @@ const Checkout = () => {
     );
   }
 
-  const shippingCost = cart.total >= 50 ? 0 : 5;
-  const tax = cart.total * 0.08;
-  const total = cart.total + shippingCost + tax;
+  const shippingCost = (cart.total || 0) >= 50 ? 0 : 5;
+  const tax = (cart.total || 0) * 0.08;
+  const total = (cart.total || 0) + shippingCost + tax;
 
   return (
     <div className="checkout-container">
@@ -322,7 +327,7 @@ const Checkout = () => {
           <div className="summary-totals">
             <div className="summary-row">
               <span>Subtotal</span>
-              <span>${cart.total.toFixed(2)}</span>
+              <span>${(cart.total || 0).toFixed(2)}</span>
             </div>
             <div className="summary-row">
               <span>Shipping</span>

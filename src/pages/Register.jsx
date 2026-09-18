@@ -42,9 +42,15 @@ const Register = () => {
       return false;
     }
 
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    if (!passwordRegex.test(formData.password)) {
+      setError('Password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character');
+      return false;
+    }
+
     const mobileRegex = /^[6-9]\d{9}$/;
     if (!mobileRegex.test(formData.mobileNumber)) {
-      setError('Invalid mobile number format');
+      setError('Invalid mobile number format. Must be 10 digits starting with 6-9');
       return false;
     }
 

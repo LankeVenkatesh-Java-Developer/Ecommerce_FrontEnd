@@ -140,7 +140,7 @@ const Profile = () => {
     if (!window.confirm('Are you sure you want to delete this address?')) return;
 
     try {
-      await userService.deleteAddress(user.id, addressId);
+      await userService.deleteAddress(addressId, user.id);
       toast.success('Address deleted successfully');
       fetchAddresses();
     } catch (err) {
@@ -155,7 +155,7 @@ const Profile = () => {
 
     try {
       if (editingAddress) {
-        await userService.updateAddress(user.id, editingAddress.id, addressForm);
+        await userService.updateAddress(editingAddress.id, user.id, addressForm);
         toast.success('Address updated successfully');
       } else {
         await userService.addAddress(user.id, addressForm);

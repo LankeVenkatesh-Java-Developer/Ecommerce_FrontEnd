@@ -11,29 +11,13 @@ import Notifications from './Notifications';
 const Navbar = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [cartItemCount, setCartItemCount] = useState(0);
 
   const { isAuthenticated, user, role } = useSelector((state) => state.auth);
+  const { itemCount } = useSelector((state) => state.cart);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
   const { isDarkMode, toggleTheme } = useTheme();
-
-  useEffect(() => {
-    const updateCartCount = () => {
-      const count = cartService.getCartItemCount();
-      setCartItemCount(count);
-    };
-
-    updateCartCount();
-
-    // Listen for cart updates
-    window.addEventListener('cartUpdated', updateCartCount);
-
-    return () => {
-      window.removeEventListener('cartUpdated', updateCartCount);
-    };
-  }, []);
 
   const handleLogout = () => {
     authService.logout();
@@ -122,9 +106,9 @@ const Navbar = () => {
                   <Link to="/cart" className="relative nav-link text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 font-medium transition-colors flex items-center" onClick={closeMobileMenu}>
                     <FaShoppingCart />
                     <span className="ml-2">Cart</span>
-                    {cartItemCount > 0 && (
+                    {itemCount > 0 && (
                       <span className="absolute -top-2 -right-2 bg-gradient-to-r from-primary-500 to-primary-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center shadow-lg">
-                        {cartItemCount}
+                        {itemCount}
                       </span>
                     )}
                   </Link>
@@ -197,9 +181,9 @@ const Navbar = () => {
                 <Link to="/cart" className="relative nav-link text-gray-700 dark:text-gray-300 hover:text-primary-500 dark:hover:text-primary-400 font-medium transition-colors py-2 flex items-center" onClick={closeMobileMenu}>
                   <FaShoppingCart />
                   <span className="ml-2">Cart</span>
-                  {cartItemCount > 0 && (
+                  {itemCount > 0 && (
                     <span className="absolute -top-1 -right-1 bg-gradient-to-r from-primary-500 to-primary-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center shadow-lg">
-                      {cartItemCount}
+                      {itemCount}
                     </span>
                   )}
                 </Link>

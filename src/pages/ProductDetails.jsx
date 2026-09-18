@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { FaShoppingCart, FaStar, FaArrowLeft, FaCheck } from 'react-icons/fa';
+import { useSelector } from 'react-redux';
 import { productService } from '../services/productService';
 import Loading from '../components/Loading';
 import ErrorMessage from '../components/ErrorMessage';
@@ -15,6 +16,7 @@ const ProductDetails = () => {
   const [error, setError] = useState('');
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
+  const { user } = useSelector((state) => state.auth);
 
   useEffect(() => {
     fetchProduct();
@@ -48,7 +50,7 @@ const ProductDetails = () => {
     if (!product) return;
 
     try {
-      await cartService.addToCart(null, product, quantity);
+      await cartService.addToCart(user?.id, product, quantity);
       window.dispatchEvent(new Event('cartUpdated'));
       toast.success(`Added ${quantity} item(s) to cart!`);
     } catch (error) {

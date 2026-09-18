@@ -25,11 +25,11 @@ const ApiTestPage = () => {
   // User Service Tests
   const testUserService = async () => {
     setLoading(true);
-    const baseUrl = import.meta.env.VITE_USER_SERVICE_URL || 'http://localhost:8081';
+    const baseUrl = import.meta.env.VITE_API_USER_SERVICE || 'http://localhost:8081/api/v1';
     
     try {
       // Test health endpoint
-      await axios.get(`${baseUrl}/actuator/health`).then(res => {
+      await axios.get(`${baseUrl.replace('/api/v1', '')}/actuator/health`).then(res => {
         addResult('User Service', '/actuator/health', 'GET', res.status, res.data);
       });
     } catch (error) {
@@ -45,23 +45,23 @@ const ApiTestPage = () => {
         lastName: 'User',
         mobile: '9876543210'
       };
-      await axios.post(`${baseUrl}/api/v1/auth/register`, testUser).then(res => {
-        addResult('User Service', '/api/v1/auth/register', 'POST', res.status, res.data);
+      await axios.post(`${baseUrl}/auth/register`, testUser).then(res => {
+        addResult('User Service', '/auth/register', 'POST', res.status, res.data);
       });
     } catch (error) {
-      addResult('User Service', '/api/v1/auth/register', 'POST', error.response?.status || 0, null, error.message);
+      addResult('User Service', '/auth/register', 'POST', error.response?.status || 0, null, error.message);
     }
 
     try {
       // Test login endpoint
-      await axios.post(`${baseUrl}/api/v1/auth/login`, {
+      await axios.post(`${baseUrl}/auth/login`, {
         emailOrMobile: 'test@example.com',
         password: 'Test@123'
       }).then(res => {
-        addResult('User Service', '/api/v1/auth/login', 'POST', res.status, res.data);
+        addResult('User Service', '/auth/login', 'POST', res.status, res.data);
       });
     } catch (error) {
-      addResult('User Service', '/api/v1/auth/login', 'POST', error.response?.status || 0, null, error.message);
+      addResult('User Service', '/auth/login', 'POST', error.response?.status || 0, null, error.message);
     }
 
     setLoading(false);
@@ -70,11 +70,11 @@ const ApiTestPage = () => {
   // Products Service Tests
   const testProductsService = async () => {
     setLoading(true);
-    const baseUrl = import.meta.env.VITE_PRODUCTS_SERVICE_URL || 'http://localhost:8082';
+    const baseUrl = import.meta.env.VITE_API_PRODUCTS_SERVICE || 'http://localhost:8082/api';
     
     try {
       // Test health endpoint
-      await axios.get(`${baseUrl}/actuator/health`).then(res => {
+      await axios.get(`${baseUrl.replace('/api', '')}/actuator/health`).then(res => {
         addResult('Products Service', '/actuator/health', 'GET', res.status, res.data);
       });
     } catch (error) {
@@ -83,38 +83,38 @@ const ApiTestPage = () => {
 
     try {
       // Test get all categories
-      await axios.get(`${baseUrl}/api/categories`).then(res => {
-        addResult('Products Service', '/api/categories', 'GET', res.status, res.data);
+      await axios.get(`${baseUrl}/categories`).then(res => {
+        addResult('Products Service', '/categories', 'GET', res.status, res.data);
       });
     } catch (error) {
-      addResult('Products Service', '/api/categories', 'GET', error.response?.status || 0, null, error.message);
+      addResult('Products Service', '/categories', 'GET', error.response?.status || 0, null, error.message);
     }
 
     try {
       // Test get all products
-      await axios.get(`${baseUrl}/api/products?page=0&size=10`).then(res => {
-        addResult('Products Service', '/api/products', 'GET', res.status, res.data);
+      await axios.get(`${baseUrl}/products?page=0&size=10`).then(res => {
+        addResult('Products Service', '/products', 'GET', res.status, res.data);
       });
     } catch (error) {
-      addResult('Products Service', '/api/products', 'GET', error.response?.status || 0, null, error.message);
+      addResult('Products Service', '/products', 'GET', error.response?.status || 0, null, error.message);
     }
 
     try {
       // Test admin categories endpoint
-      await axios.get(`${baseUrl}/api/categories/admin/all`).then(res => {
-        addResult('Products Service', '/api/categories/admin/all', 'GET', res.status, res.data);
+      await axios.get(`${baseUrl}/categories/admin/all`).then(res => {
+        addResult('Products Service', '/categories/admin/all', 'GET', res.status, res.data);
       });
     } catch (error) {
-      addResult('Products Service', '/api/categories/admin/all', 'GET', error.response?.status || 0, null, error.message);
+      addResult('Products Service', '/categories/admin/all', 'GET', error.response?.status || 0, null, error.message);
     }
 
     try {
       // Test admin products endpoint
-      await axios.get(`${baseUrl}/api/products/admin/all?page=0&size=10`).then(res => {
-        addResult('Products Service', '/api/products/admin/all', 'GET', res.status, res.data);
+      await axios.get(`${baseUrl}/products/admin/all?page=0&size=10`).then(res => {
+        addResult('Products Service', '/products/admin/all', 'GET', res.status, res.data);
       });
     } catch (error) {
-      addResult('Products Service', '/api/products/admin/all', 'GET', error.response?.status || 0, null, error.message);
+      addResult('Products Service', '/products/admin/all', 'GET', error.response?.status || 0, null, error.message);
     }
 
     setLoading(false);
@@ -123,11 +123,11 @@ const ApiTestPage = () => {
   // Admin Service Tests
   const testAdminService = async () => {
     setLoading(true);
-    const baseUrl = import.meta.env.VITE_ADMIN_SERVICE_URL || 'http://localhost:8083';
+    const baseUrl = import.meta.env.VITE_API_ADMIN_SERVICE || 'http://localhost:8083/api/admin';
     
     try {
       // Test health endpoint
-      await axios.get(`${baseUrl}/actuator/health`).then(res => {
+      await axios.get(`${baseUrl.replace('/api/admin', '')}/actuator/health`).then(res => {
         addResult('Admin Service', '/actuator/health', 'GET', res.status, res.data);
       });
     } catch (error) {
@@ -136,20 +136,20 @@ const ApiTestPage = () => {
 
     try {
       // Test admin categories endpoint
-      await axios.get(`${baseUrl}/api/admin/categories`).then(res => {
-        addResult('Admin Service', '/api/admin/categories', 'GET', res.status, res.data);
+      await axios.get(`${baseUrl}/categories`).then(res => {
+        addResult('Admin Service', '/categories', 'GET', res.status, res.data);
       });
     } catch (error) {
-      addResult('Admin Service', '/api/admin/categories', 'GET', error.response?.status || 0, null, error.message);
+      addResult('Admin Service', '/categories', 'GET', error.response?.status || 0, null, error.message);
     }
 
     try {
       // Test admin products endpoint
-      await axios.get(`${baseUrl}/api/admin/products?page=0&size=10`).then(res => {
-        addResult('Admin Service', '/api/admin/products', 'GET', res.status, res.data);
+      await axios.get(`${baseUrl}/products?page=0&size=10`).then(res => {
+        addResult('Admin Service', '/products', 'GET', res.status, res.data);
       });
     } catch (error) {
-      addResult('Admin Service', '/api/admin/products', 'GET', error.response?.status || 0, null, error.message);
+      addResult('Admin Service', '/products', 'GET', error.response?.status || 0, null, error.message);
     }
 
     setLoading(false);
@@ -158,24 +158,94 @@ const ApiTestPage = () => {
   // Order Service Tests
   const testOrderService = async () => {
     setLoading(true);
-    const baseUrl = import.meta.env.VITE_ORDER_SERVICE_URL || 'http://localhost:8084';
-    
-    try {
-      // Test health endpoint
-      await axios.get(`${baseUrl}/actuator/health`).then(res => {
-        addResult('Order Service', '/actuator/health', 'GET', res.status, res.data);
-      });
-    } catch (error) {
-      addResult('Order Service', '/actuator/health', 'GET', error.response?.status || 0, null, error.message);
-    }
+    const baseUrl = import.meta.env.VITE_API_GATEWAY || 'http://localhost:8087/api/v1';
 
     try {
       // Test get orders endpoint
-      await axios.get(`${baseUrl}/api/v1/orders/user/1`).then(res => {
-        addResult('Order Service', '/api/v1/orders/user/1', 'GET', res.status, res.data);
+      await axios.get(`${baseUrl}/orders`).then(res => {
+        addResult('Order Service', '/orders', 'GET', res.status, res.data);
       });
     } catch (error) {
-      addResult('Order Service', '/api/v1/orders/user/1', 'GET', error.response?.status || 0, null, error.message);
+      addResult('Order Service', '/orders', 'GET', error.response?.status || 0, null, error.message);
+    }
+
+    try {
+      // Test get orders by user endpoint
+      await axios.get(`${baseUrl}/orders/user/1`).then(res => {
+        addResult('Order Service', '/orders/user/1', 'GET', res.status, res.data);
+      });
+    } catch (error) {
+      addResult('Order Service', '/orders/user/1', 'GET', error.response?.status || 0, null, error.message);
+    }
+
+    setLoading(false);
+  };
+
+  // Cart Service Tests
+  const testCartService = async () => {
+    setLoading(true);
+    const baseUrl = import.meta.env.VITE_API_CART_SERVICE || 'http://localhost:8086/api/v1';
+
+    try {
+      // Test health endpoint
+      await axios.get(`${baseUrl.replace('/api/v1', '')}/actuator/health`).then(res => {
+        addResult('Cart Service', '/actuator/health', 'GET', res.status, res.data);
+      });
+    } catch (error) {
+      addResult('Cart Service', '/actuator/health', 'GET', error.response?.status || 0, null, error.message);
+    }
+
+    try {
+      // Test get cart endpoint
+      await axios.get(`${baseUrl}/cart/1`).then(res => {
+        addResult('Cart Service', '/cart/1', 'GET', res.status, res.data);
+      });
+    } catch (error) {
+      addResult('Cart Service', '/cart/1', 'GET', error.response?.status || 0, null, error.message);
+    }
+
+    try {
+      // Test admin all carts endpoint
+      await axios.get(`${baseUrl}/cart/admin/all`).then(res => {
+        addResult('Cart Service', '/cart/admin/all', 'GET', res.status, res.data);
+      });
+    } catch (error) {
+      addResult('Cart Service', '/cart/admin/all', 'GET', error.response?.status || 0, null, error.message);
+    }
+
+    setLoading(false);
+  };
+
+  // Notification Service Tests
+  const testNotificationService = async () => {
+    setLoading(true);
+    const baseUrl = import.meta.env.VITE_API_NOTIFICATION_SERVICE || 'http://localhost:8085/api/notifications';
+
+    try {
+      // Test health endpoint
+      await axios.get(`${baseUrl.replace('/api/notifications', '')}/actuator/health`).then(res => {
+        addResult('Notification Service', '/actuator/health', 'GET', res.status, res.data);
+      });
+    } catch (error) {
+      addResult('Notification Service', '/actuator/health', 'GET', error.response?.status || 0, null, error.message);
+    }
+
+    try {
+      // Test send notification endpoint
+      const testNotification = {
+        recipientEmail: 'test@example.com',
+        recipientPhone: '+1234567890',
+        customerName: 'Test User',
+        notificationType: 'ORDER_CREATED',
+        channel: 'EMAIL',
+        orderId: 'TEST-12345',
+        orderDetails: 'Test order details'
+      };
+      await axios.post(`${baseUrl}/send`, testNotification).then(res => {
+        addResult('Notification Service', '/send', 'POST', res.status, res.data);
+      });
+    } catch (error) {
+      addResult('Notification Service', '/send', 'POST', error.response?.status || 0, null, error.message);
     }
 
     setLoading(false);
@@ -186,8 +256,10 @@ const ApiTestPage = () => {
     await Promise.all([
       testUserService(),
       testProductsService(),
+      testCartService(),
       testAdminService(),
-      testOrderService()
+      testOrderService(),
+      testNotificationService()
     ]);
     toast.success('All services tested!');
   };
@@ -200,11 +272,17 @@ const ApiTestPage = () => {
     if (selectedService === 'all' || selectedService === 'products') {
       testProductsService();
     }
+    if (selectedService === 'all' || selectedService === 'cart') {
+      testCartService();
+    }
     if (selectedService === 'all' || selectedService === 'admin') {
       testAdminService();
     }
     if (selectedService === 'all' || selectedService === 'order') {
       testOrderService();
+    }
+    if (selectedService === 'all' || selectedService === 'notification') {
+      testNotificationService();
     }
   };
 
@@ -223,12 +301,12 @@ const ApiTestPage = () => {
         {/* Service Configuration */}
         <div className="bg-white rounded-lg shadow p-6 mb-6">
           <h2 className="text-xl font-semibold mb-4">Service Configuration</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">User Service</label>
               <input
                 type="text"
-                defaultValue={import.meta.env.VITE_USER_SERVICE_URL}
+                defaultValue={import.meta.env.VITE_API_USER_SERVICE}
                 className="w-full px-3 py-2 border rounded-md bg-gray-50"
                 disabled
               />
@@ -237,7 +315,16 @@ const ApiTestPage = () => {
               <label className="block text-sm font-medium text-gray-700 mb-1">Products Service</label>
               <input
                 type="text"
-                defaultValue={import.meta.env.VITE_PRODUCTS_SERVICE_URL}
+                defaultValue={import.meta.env.VITE_API_PRODUCTS_SERVICE}
+                className="w-full px-3 py-2 border rounded-md bg-gray-50"
+                disabled
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Cart Service</label>
+              <input
+                type="text"
+                defaultValue={import.meta.env.VITE_API_CART_SERVICE}
                 className="w-full px-3 py-2 border rounded-md bg-gray-50"
                 disabled
               />
@@ -246,7 +333,7 @@ const ApiTestPage = () => {
               <label className="block text-sm font-medium text-gray-700 mb-1">Admin Service</label>
               <input
                 type="text"
-                defaultValue={import.meta.env.VITE_ADMIN_SERVICE_URL}
+                defaultValue={import.meta.env.VITE_API_ADMIN_SERVICE}
                 className="w-full px-3 py-2 border rounded-md bg-gray-50"
                 disabled
               />
@@ -255,7 +342,16 @@ const ApiTestPage = () => {
               <label className="block text-sm font-medium text-gray-700 mb-1">Order Service</label>
               <input
                 type="text"
-                defaultValue={import.meta.env.VITE_ORDER_SERVICE_URL}
+                defaultValue={import.meta.env.VITE_API_ORDER_SERVICE}
+                className="w-full px-3 py-2 border rounded-md bg-gray-50"
+                disabled
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Notification Service</label>
+              <input
+                type="text"
+                defaultValue={import.meta.env.VITE_API_NOTIFICATION_SERVICE}
                 className="w-full px-3 py-2 border rounded-md bg-gray-50"
                 disabled
               />
@@ -277,8 +373,10 @@ const ApiTestPage = () => {
                 <option value="all">All Services</option>
                 <option value="user">User Service</option>
                 <option value="products">Products Service</option>
+                <option value="cart">Cart Service</option>
                 <option value="admin">Admin Service</option>
                 <option value="order">Order Service</option>
+                <option value="notification">Notification Service</option>
               </select>
             </div>
             <button
@@ -351,19 +449,19 @@ const ApiTestPage = () => {
         {/* Service Status Summary */}
         <div className="bg-white rounded-lg shadow p-6 mt-6">
           <h2 className="text-xl font-semibold mb-4">Service Status Summary</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {['User Service', 'Products Service', 'Admin Service', 'Order Service'].map((service) => {
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {['User Service', 'Products Service', 'Cart Service', 'Admin Service', 'Order Service', 'Notification Service'].map((service) => {
               const serviceResults = results.filter(r => r.service === service);
               const successCount = serviceResults.filter(r => r.status >= 200 && r.status < 300).length;
               const totalCount = serviceResults.length;
               const status = totalCount === 0 ? 'pending' : successCount === totalCount ? 'success' : 'partial';
-              
+
               return (
                 <div key={service} className="border rounded-lg p-4">
                   <h3 className="font-semibold text-gray-900 mb-2">{service}</h3>
                   <div className="flex items-center gap-2">
                     <div className={`w-3 h-3 rounded-full ${
-                      status === 'success' ? 'bg-green-500' : 
+                      status === 'success' ? 'bg-green-500' :
                       status === 'partial' ? 'bg-yellow-500' : 'bg-gray-300'
                     }`} />
                     <span className="text-sm text-gray-600">

@@ -173,6 +173,8 @@ const OrderDetails = () => {
                       {item.name}
                     </Link>
                     <p className="item-qty">Quantity: {item.quantity}</p>
+                    {item.productSku && <p className="item-sku">SKU: {item.productSku}</p>}
+                    {item.productBrand && <p className="item-brand">Brand: {item.productBrand}</p>}
                   </div>
                   <div className="item-price">${(item.price * item.quantity).toFixed(2)}</div>
                 </div>

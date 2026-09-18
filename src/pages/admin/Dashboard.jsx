@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FaBox, FaShoppingCart, FaUsers, FaDollarSign, FaArrowUp, FaArrowDown, FaTags, FaChartBar } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { productService } from '../../services/productService';
+import adminManagementService from '../../services/adminManagementService';
 import Loading from '../../components/Loading';
 import './Dashboard.css';
 
@@ -14,6 +15,9 @@ const Dashboard = () => {
     totalCategories: 0,
     totalStock: 0,
     totalUsers: 0,
+    pendingOrders: 0,
+    processingOrders: 0,
+    deliveredOrders: 0,
   });
   const [recentOrders, setRecentOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -25,26 +29,39 @@ const Dashboard = () => {
   const fetchDashboardData = async () => {
     setLoading(true);
     try {
-      const [productsData, categoriesData] = await Promise.all([
+      const [productsData, categoriesData, ordersData] = await Promise.all([
         productService.getAllProductsAdmin({ page: 0, size: 100, sort: 'name,asc' }),
         productService.getAllCategoriesAdmin(),
+        adminManagementService.getAllOrders().catch(() => []),
       ]);
       
       const products = productsData.content || productsData || [];
       const totalProducts = products.length;
       const totalStock = products.reduce((sum, product) => sum + (product.quantity || 0), 0);
       const totalCategories = Array.isArray(categoriesData) ? categoriesData.length : categoriesData.content?.length || 0;
+      
+      const orders = Array.isArray(ordersData) ? ordersData : [];
+      const totalOrders = orders.length;
+      const totalRevenue = orders.reduce((sum, order) => sum + (order.totalAmount || 0), 0);
+      const pendingOrders = orders.filter(o => o.status === 'PENDING').length;
+      const processingOrders = orders.filter(o => o.status === 'PROCESSING').length;
+      const deliveredOrders = orders.filter(o => o.status === 'DELIVERED').length;
+      
+      const recentOrders = orders.slice(0, 5);
 
       setStats({
-        totalOrders: 0, // Orders not available yet
-        totalRevenue: 0, // Revenue not available yet
-        totalProducts: totalProducts,
-        totalCategories: totalCategories,
-        totalStock: totalStock,
+        totalOrders,
+        totalRevenue,
+        totalProducts,
+        totalCategories,
+        totalStock,
         totalUsers: 1, // Current admin user
+        pendingOrders,
+        processingOrders,
+        deliveredOrders,
       });
 
-      setRecentOrders([]); // No orders available yet
+      setRecentOrders(recentOrders);
     } catch (err) {
       console.error('Failed to fetch dashboard data:', err);
       setStats({
@@ -54,7 +71,11 @@ const Dashboard = () => {
         totalCategories: 0,
         totalStock: 0,
         totalUsers: 1,
+        pendingOrders: 0,
+        processingOrders: 0,
+        deliveredOrders: 0,
       });
+      setRecentOrders([]);
     } finally {
       setLoading(false);
     }

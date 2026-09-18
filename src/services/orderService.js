@@ -13,6 +13,11 @@ export const orderService = {
     return response.data;
   },
 
+  getUserOrders: async (userId) => {
+    const response = await orderApi.get(ORDER_ENDPOINTS.GET_USER_ORDERS(userId));
+    return response.data;
+  },
+
   getOrderById: async (orderId) => {
     const response = await orderApi.get(ORDER_ENDPOINTS.GET_ORDER(orderId));
     return response.data;

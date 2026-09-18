@@ -1,10 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { getUser, setUser, removeUser, getToken, clearAuthData } from '../../utils/tokenUtils';
+import { getUser, setUser, removeUser, getToken, clearAuthData, getRole, extractRoleFromToken } from '../../utils/tokenUtils';
 
 const initialState = {
   user: getUser(),
   token: getToken(),
-  role: localStorage.getItem('userRole'),
+  role: getRole() || extractRoleFromToken(getToken()),
   isAuthenticated: !!getToken(),
   loading: false,
   error: null,

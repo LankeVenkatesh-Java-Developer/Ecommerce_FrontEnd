@@ -30,7 +30,9 @@ import Unauthorized from './pages/Unauthorized';
 import Dashboard from './pages/admin/Dashboard';
 import Categories from './pages/admin/Categories';
 import AdminProducts from './pages/admin/Products';
+import AdminOrders from './pages/admin/Orders';
 import Reports from './pages/admin/Reports';
+import Users from './pages/admin/Users';
 
 // Test Page
 import ApiTestPage from './pages/ApiTestPage';
@@ -203,11 +205,33 @@ function App() {
                         />
 
                         <Route
+                            path="/admin/orders"
+                            element={
+                                <ProtectedRoute requireAdmin>
+                                    <AdminLayout>
+                                        <AdminOrders />
+                                    </AdminLayout>
+                                </ProtectedRoute>
+                            }
+                        />
+
+                        <Route
                             path="/admin/reports"
                             element={
                                 <ProtectedRoute requireAdmin>
                                     <AdminLayout>
                                         <Reports />
+                                    </AdminLayout>
+                                </ProtectedRoute>
+                            }
+                        />
+
+                        <Route
+                            path="/admin/users"
+                            element={
+                                <ProtectedRoute requireSuperAdmin>
+                                    <AdminLayout>
+                                        <Users />
                                     </AdminLayout>
                                 </ProtectedRoute>
                             }

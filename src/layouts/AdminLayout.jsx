@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { FaHome, FaBox, FaTags, FaChartBar, FaSignOutAlt, FaBars, FaTimes } from 'react-icons/fa';
+import { FaHome, FaBox, FaTags, FaChartBar, FaSignOutAlt, FaBars, FaTimes, FaUsers, FaCog, FaShieldAlt } from 'react-icons/fa';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout } from '../store/slices/authSlice';
 import { authService } from '../services/authService';
@@ -8,7 +8,7 @@ import { toast } from 'react-toastify';
 
 const AdminLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const { user } = useSelector((state) => state.auth);
+  const { user, role } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const location = useLocation();
 
@@ -22,12 +22,26 @@ const AdminLayout = () => {
     }
   };
 
-  const menuItems = [
+  // Base menu items for both ADMIN and SUPER_ADMIN
+  const baseMenuItems = [
     { path: '/admin', icon: FaHome, label: 'Dashboard' },
     { path: '/admin/categories', icon: FaTags, label: 'Categories' },
     { path: '/admin/products', icon: FaBox, label: 'Products' },
+    { path: '/admin/orders', icon: FaBox, label: 'Orders' },
     { path: '/admin/reports', icon: FaChartBar, label: 'Reports' },
   ];
+
+  // Super Admin only menu items
+  const superAdminMenuItems = [
+    { path: '/admin/users', icon: FaUsers, label: 'Admin Users' },
+    { path: '/admin/roles', icon: FaShieldAlt, label: 'Roles & Permissions' },
+    { path: '/admin/settings', icon: FaCog, label: 'System Settings' },
+  ];
+
+  // Combine menu items based on role
+  const menuItems = role === 'SUPER_ADMIN' 
+    ? [...baseMenuItems, ...superAdminMenuItems]
+    : baseMenuItems;
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 flex">

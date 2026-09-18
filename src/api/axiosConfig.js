@@ -1,10 +1,12 @@
 import axios from 'axios';
 import { getToken, removeToken } from '../utils/tokenUtils';
-import { 
-  USER_SERVICE_URL, 
-  PRODUCTS_SERVICE_URL, 
-  ADMIN_SERVICE_URL, 
-  ORDER_SERVICE_URL 
+import {
+  USER_SERVICE_URL,
+  PRODUCTS_SERVICE_URL,
+  CART_SERVICE_URL,
+  ADMIN_SERVICE_URL,
+  ORDER_SERVICE_URL,
+  NOTIFICATION_SERVICE_URL
 } from './endpoints';
 
 // Create axios instance factory function
@@ -76,8 +78,17 @@ const createAxiosInstance = (baseURL) => {
 // Create axios instances for each service
 export const userApi = createAxiosInstance(USER_SERVICE_URL);
 export const productsApi = createAxiosInstance(PRODUCTS_SERVICE_URL);
+export const cartApi = createAxiosInstance(CART_SERVICE_URL);
 export const adminApi = createAxiosInstance(ADMIN_SERVICE_URL);
 export const orderApi = createAxiosInstance(ORDER_SERVICE_URL);
+
+// Notification service doesn't require JWT authentication
+export const notificationApi = axios.create({
+  baseURL: NOTIFICATION_SERVICE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
 
 // Default export for backward compatibility (uses user service)
 export default userApi;

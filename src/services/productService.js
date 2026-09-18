@@ -26,13 +26,13 @@ export const productService = {
   },
 
   getProductsByCategory: async (categoryId, params = {}) => {
-    const allParams = { ...params, category: categoryId };
+    const allParams = { ...params, categoryId: categoryId };
     const response = await productsApi.get(PRODUCT_ENDPOINTS.GET_ALL_PRODUCTS, { params: allParams });
     return response.data;
   },
 
   searchProducts: async (searchTerm, params = {}) => {
-    const allParams = { ...params, name: searchTerm };
+    const allParams = { ...params, search: searchTerm };
     const response = await productsApi.get(PRODUCT_ENDPOINTS.SEARCH_PRODUCTS, { params: allParams });
     return response.data;
   },

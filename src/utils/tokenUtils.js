@@ -40,6 +40,17 @@ export const setRole = (role) => {
   localStorage.setItem(ROLE_KEY, role);
 };
 
+export const extractRoleFromToken = (token) => {
+  try {
+    const payload = token.split('.')[1];
+    const decoded = JSON.parse(atob(payload));
+    return decoded.role || null;
+  } catch (error) {
+    console.error('Failed to extract role from token:', error);
+    return null;
+  }
+};
+
 export const removeRole = () => {
   localStorage.removeItem(ROLE_KEY);
 };
